@@ -1,8 +1,5 @@
 ---
-:nick: elfari-test
 :server: irc.freenode.net
-:channels:
-  - "#elfari-test"
 :abiquo:
   :host: mothership
   :user: admin
@@ -15,3 +12,7 @@
     - :name: Abiquo Enterprise
       :path: '/Users/rubiojr/git/abiquo-enterprise'
         
+:nick: elfari2
+:channels:
+  - "#foobarslkj chan-key"
+:mplayer: '/usr/bin/mplayer'

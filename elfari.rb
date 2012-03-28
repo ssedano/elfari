@@ -1,4 +1,4 @@
-#
+
 # Needs rubygems and cinch:
 #
 # sudo apt-get install rubygems
@@ -15,8 +15,10 @@ require 'alchemist'
 require 'rufus/scheduler'
 require 'abiquo-deployer'
 require 'uri'
-
-#$SAFE = 4
+require 'mplayer-ruby'
+require 'ruby-youtube-dl'
+require 'em-synchrony'
+##$SAFE = 4
 
 module ElFari
 
@@ -102,14 +104,16 @@ bot = Cinch::Bot.new do
     c.plugins.plugins = [Motherfuckers]
   end
 
-  on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/youtube", :url => query
-    title = RestClient.get('http://bigdick.local:4567/current_video')
-    while title.nil? or title.strip.chomp.empty?
-      title = RestClient.get('http://bigdick.local:4567/current_video')
-    end
-    m.reply "Tomalo, chato: #{title}"
-  end
+  @mplayer_bin = conf[:mplayer]
+
+  #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+    #RestClient.post "http://bigdick.local:4567/youtube", :url => query
+    #title = RestClient.get('http://bigdick.local:4567/current_video')
+    #while title.nil? or title.strip.chomp.empty?
+      #title = RestClient.get('http://bigdick.local:4567/current_video')
+    #end
+    #m.reply "Tomalo, chato: #{title}"
+  #end
   on :message, /dimelo (.*)/ do |m, query|
     RestClient.post "http://bigdick.local:4567/say", :text => query
   end
@@ -120,47 +124,73 @@ bot = Cinch::Bot.new do
     m.reply 'Ahi van los comandos, chavalote!: ayudame dimelo ponmelo volumen mele in-inglis ponmeargo ponmeer quetiene'
   end
   on :message, /volumen (.*)/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/volume", :vol => query
+        @mplayer.volume(:set,query * 10) unless @mplayer.nil?
   end
   on :message, /mele/ do |m, query|
     RestClient.post "http://bigdick.local:4567/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
     m.reply "Paralo Paul!!!"
   end
   on :message, /vino/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/video", :url => 'http://www.youtube.com/watch?v=-nQgsEbU9C4'
+    flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
+    if @mplayer.nil?
+        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+    else
+        @mplayer.load_file(flv)
+    end
     m.reply "Viva el vino!!!"
   end
   on :message, /ponme\s*argo\s*(.*)/ do |m, query|
     db = File.readlines('database')
     play = db[(rand * (db.size - 1)).to_i].split(/ /)[0]
-    RestClient.post "http://bigdick.local:4567/youtube", :url => play
-    title = RestClient.get('http://bigdick.local:4567/current_video')
-    while title.nil? or title.strip.chomp.empty?
-      title = RestClient.get('http://bigdick.local:4567/current_video')
+    flv = YoutubeDL::Downloader.url_flv(play)
+    if @mplayer.nil?
+       @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+    else
+       @mplayer.load_file(flv)
     end
+    title =YoutubeDL::Downloader.video_title(play) 
     m.reply "Tomalo, chato: #{title}"
   end
-
+  on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+    flv = YoutubeDL::Downloader.url_flv(query)
+    if @mplayer.nil?
+        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
+    else
+        @mplayer.load_file(flv)
+    end
+    m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
+  end
+ 
   on :message, /ponme\s*er\s*(.*)/ do |m, query|
     db = File.readlines('database')
     found = false
     db.each do |line|
       if line =~ /#{query}/i
         play = line.split(/ /)[0]
-        RestClient.post "http://bigdick.local:4567/youtube", :url => play
-        title = RestClient.get('http://bigdick.local:4567/current_video')
-        while title.nil? or title.strip.chomp.empty?
-            title = RestClient.get('http://bigdick.local:4567/current_video')
+        flv = YoutubeDL::Downloader.url_flv(play)
+        if @mplayer.nil?
+           @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+        else
+           @mplayer.load_file(flv)
         end
+        title =Youtube::Downloader.video_title(play) 
         m.reply "Tomalo, chato: #{title}"
         found = true
         break
       end
     end
-  	RestClient.post "http://bigdick.local:4567/say", :text => "No tengo er #{query}" if !found
   	m.reply "No tengo er: #{query}" if !found
   end
 
+  on :message, /luego\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+      flv = YoutubeDL::Downloader.url_flv(query)
+      if @mplayer.nil?
+          @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+      else
+          @mplayer.load_file flv, :append
+      end
+      m.reply "Luego te pongo " + YoutubeDL::Downloader.video_title(query)
+  end
   on :message, /que\s*tiene/ do |m, query|
 	  db = File.readlines('database')
 	  list = "Tengo esto piltrafa:\n"
@@ -266,4 +296,4 @@ bot = Cinch::Bot.new do
   #end
 end
 
-bot.start
+EM.run {bot.start}

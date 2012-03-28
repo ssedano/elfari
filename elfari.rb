@@ -102,10 +102,15 @@ bot = Cinch::Bot.new do
     c.channels = conf[:channels]
     c.nick = conf[:nick]
     c.plugins.plugins = [Motherfuckers]
+    c.timeouts.connect = conf[:timeout]
   end
 
   @mplayer_bin = conf[:mplayer]
-
+  if @mplayer.nil?
+      @player = MPlayer::Slave.new '', :singleton => true, :vo => 'null', :preferred_ip => 4
+  else
+      @player = MPlayer::Slave.new '', :path => @mplayer_bin, :preferred_ip => 4, :singleton => true, :preferred_ip => 4
+  end
   #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
     #RestClient.post "http://bigdick.local:4567/youtube", :url => query
     #title = RestClient.get('http://bigdick.local:4567/current_video')

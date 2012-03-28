@@ -1,5 +1,6 @@
 ---
 :server: irc.freenode.net
+
 :abiquo:
   :host: mothership
   :user: admin
@@ -15,4 +16,5 @@
 :nick: elfari2
 :channels:
   - "#foobarslkj chan-key"
-:mplayer: '/usr/bin/mplayer'
+:mplayer: '/opt/local/bin/mplayer'
+:timeout: 10000

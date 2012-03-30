@@ -178,7 +178,7 @@ bot = Cinch::Bot.new do
         else
            @mplayer.load_file(flv)
         end
-        title =Youtube::Downloader.video_title(play) 
+        title =YoutubeDL::Downloader.video_title(play) 
         m.reply "Tomalo, chato: #{title}"
         found = true
         break

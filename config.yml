@@ -16,5 +16,4 @@
 :nick: elfari2
 :channels:
   - "#foobarslkj chan-key"
-:mplayer: '/opt/local/bin/mplayer'
 :timeout: 10000

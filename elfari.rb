@@ -114,7 +114,7 @@ bot = Cinch::Bot.new do
       Time.new.hour.times { %x[beep  2&>1 && sleep 1]} if @ring
   end
 
-  scheduler.cron '0 * * * * *' do
+  scheduler.cron '0 * * * *' do
       bells
   end
 

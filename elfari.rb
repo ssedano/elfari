@@ -19,7 +19,7 @@ require 'mplayer-ruby'
 require 'ruby-youtube-dl'
 require 'em-synchrony'
 ##$SAFE = 4
-
+require File.dirname(__FILE__) + '/elfari_util'
 module ElFari
 
   class Config
@@ -88,9 +88,9 @@ class ControlWS
   
   def self.say(text, voice = :spanish)
     if voice == :english
-      RestClient.post "http://bigdick.local:4567/say", :text => text, :voice => 'Alex'
+      RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => text, :voice => 'Alex'
     else
-      RestClient.post "http://bigdick.local:4567/say", :text => text
+      RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => text
     end
   end
 
@@ -101,10 +101,36 @@ bot = Cinch::Bot.new do
     c.server = conf[:server]
     c.channels = conf[:channels]
     c.nick = conf[:nick]
-    c.plugins.plugins = [Motherfuckers]
+    #c.plugins.plugins = [Motherfuckers]
     c.timeouts.connect = conf[:timeout]
   end
+  scheduler = Rufus::Scheduler.start_new
+  
+  @ring = false 
+  def bells
+      ElFari::Config.config[:channels].each do |c|
+          Channel(c.split.first).send "Son las #{Time.new.hour}"
+      end
+      Time.new.hour.times { %x[beep  2&>1 && sleep 1]} if @ring
+  end
 
+  scheduler.cron '0 * * * * *' do
+      bells
+  end
+
+  on :message, /\s*con campanadas\s*/ do |m, query|
+      @ring = true
+      m.reply "Las horas con beeps, para desactivarlo: s/con/sin/"
+  end
+  on :message, /\s*sin campandas\s*/ do |m, query|
+      @ring = false
+      m.reply "Sin campanadas"
+  end
+  @elfari_port = conf[:elfari][:port]
+  raise "Invalid elfari port" unless @elfari_port
+  @elfari_url = conf[:elfari][:url]
+  raise "Invalid elfari url" unless @elfari_url
+  
   @mplayer_bin = conf[:mplayer]
   if @mplayer.nil?
       @player = MPlayer::Slave.new '', :singleton => true, :vo => 'null', :preferred_ip => 4
@@ -112,18 +138,18 @@ bot = Cinch::Bot.new do
       @player = MPlayer::Slave.new '', :path => @mplayer_bin, :preferred_ip => 4, :singleton => true, :preferred_ip => 4
   end
   #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
-    #RestClient.post "http://bigdick.local:4567/youtube", :url => query
-    #title = RestClient.get('http://bigdick.local:4567/current_video')
+    #RestClient.post "http://@elfari_url:@elfari_port/youtube", :url => query
+    #title = RestClient.get('http://@elfari_url:@elfari_port/current_video')
     #while title.nil? or title.strip.chomp.empty?
-      #title = RestClient.get('http://bigdick.local:4567/current_video')
+      #title = RestClient.get('http://@elfari_url:@elfari_port/current_video')
     #end
     #m.reply "Tomalo, chato: #{title}"
   #end
   on :message, /dimelo (.*)/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/say", :text => query
+    RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query
   end
   on :message, /in-inglis (.*)/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/say", :text => query, :voice => 'Alex'
+    RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query, :voice => 'Alex'
   end
   on :message, /ayudame/ do |m|
     m.reply 'Ahi van los comandos, chavalote!: ayudame dimelo ponmelo volumen mele in-inglis ponmeargo ponmeer quetiene'
@@ -132,7 +158,7 @@ bot = Cinch::Bot.new do
         @mplayer.volume(:set,query * 10) unless @mplayer.nil?
   end
   on :message, /mele/ do |m, query|
-    RestClient.post "http://bigdick.local:4567/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
+    RestClient.post "http://#{@elfari_url}:#{@elfari_port}/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
     m.reply "Paralo Paul!!!"
   end
   on :message, /vino/ do |m, query|
@@ -156,7 +182,18 @@ bot = Cinch::Bot.new do
     title =YoutubeDL::Downloader.video_title(play) 
     m.reply "Tomalo, chato: #{title}"
   end
-  on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+   on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+    flv = YoutubeDL::Downloader.url_flv(query)
+    if @mplayer.nil?
+        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
+    else
+        @mplayer.load_file(flv)
+    end
+    m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
+  end
+  on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)\s*en\s*el\s*(.*)\s?/ do |m, query, seek|
+    m.reply seek
+    m.reply ElFariUtil.extract_seek_time(seek)
     flv = YoutubeDL::Downloader.url_flv(query)
     if @mplayer.nil?
         @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
@@ -215,7 +252,7 @@ bot = Cinch::Bot.new do
         rhyme["</rhyme>"] = ""
         rhyme["<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"] = ""
         m.reply "#{rhyme}"
-        RestClient.post "http://bigdick.local:4567/say", :text => "#{rhyme}"
+        RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => "#{rhyme}"
   end
 
   on :message, /mothership abusers/ do  |m, query|

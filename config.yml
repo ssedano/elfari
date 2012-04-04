@@ -17,3 +17,7 @@
 :channels:
   - "#foobarslkj chan-key"
 :timeout: 10000
+
+:elfari:
+  :url: localhost
+  :port: 4567 

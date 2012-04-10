@@ -20,4 +20,5 @@
 
 :elfari:
   :url: localhost
-  :port: 4567 
+  :port: 4567
+:mplayer: '/usr/bin/mplayer' 

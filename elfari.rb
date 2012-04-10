@@ -132,11 +132,7 @@ bot = Cinch::Bot.new do
   raise "Invalid elfari url" unless @elfari_url
   
   @mplayer_bin = conf[:mplayer]
-  if @mplayer.nil?
-      @player = MPlayer::Slave.new '', :singleton => true, :vo => 'null', :preferred_ip => 4
-  else
-      @player = MPlayer::Slave.new '', :path => @mplayer_bin, :preferred_ip => 4, :singleton => true, :preferred_ip => 4
-  end
+  raise "Mplayer not present" if @mplayer_bin.nil?
   #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
     #RestClient.post "http://@elfari_url:@elfari_port/youtube", :url => query
     #title = RestClient.get('http://@elfari_url:@elfari_port/current_video')
@@ -222,6 +218,16 @@ bot = Cinch::Bot.new do
       end
     end
   	m.reply "No tengo er: #{query}" if !found
+  end
+
+  on :message, /apunta\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
+      title = YoutubeDL::Downloader.video_title(query)
+      if title.nil?
+          m.reply "No me suena"
+      else
+         File.open('database', 'a') { |n| n.puts "#{query} - #{title}\n"}
+         m.reply "#{title} en la base de datos"
+      end
   end
 
   on :message, /luego\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|

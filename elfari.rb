@@ -150,8 +150,8 @@ bot = Cinch::Bot.new do
   on :message, /ayudame/ do |m|
     m.reply 'Ahi van los comandos, chavalote!: ayudame dimelo ponmelo volumen mele in-inglis ponmeargo ponmeer quetiene'
   end
-  on :message, /volumen (.*)/ do |m, query|
-        @mplayer.volume(:set,query * 10) unless @mplayer.nil?
+  on :message, /volumen\s*(\d*)/ do |m, query|
+        @mplayer.volume(:set, query.to_i * 10) unless @mplayer.nil?
   end
   on :message, /mele/ do |m, query|
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
@@ -196,6 +196,7 @@ bot = Cinch::Bot.new do
     else
         @mplayer.load_file(flv)
     end
+    @mplayer.seek(seek, :absolute) unless @mplayer.nil?
     m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
   end
  

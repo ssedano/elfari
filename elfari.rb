@@ -197,8 +197,7 @@ bot = Cinch::Bot.new do
     m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
   end
   on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)\s*en\s*el\s*(.*)\s?/ do |m, query, seek|
-    m.reply seek
-    m.reply ElFariUtil.extract_seek_time(seek)
+    time = ElFariUtil.extract_seek_time(seek)
     @mplayer_bin = ElFari::Config.config[:mplayer]
     flv = YoutubeDL::Downloader.url_flv(query)
     if @mplayer.nil?
@@ -206,7 +205,7 @@ bot = Cinch::Bot.new do
     else
         @mplayer.load_file(flv)
     end
-    @mplayer.seek(seek, :absolute) unless @mplayer.nil?
+    @mplayer.seek(time, :absolute) unless @mplayer.nil?
     m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
   end
  

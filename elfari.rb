@@ -88,9 +88,13 @@ class ControlWS
   
   def self.say(text, voice = :spanish)
     if voice == :english
+      @elfari_port = ElFari::Config.config[:elfari][:port]
+      @elfari_url = ElFari::Config.config[:elfari][:url]
       RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => text, :voice => 'Alex'
     else
-      RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => text
+       @elfari_port = ElFari::Config.config[:elfari][:port]
+       @elfari_url = ElFari::Config.config[:elfari][:url]
+       RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => text
     end
   end
 
@@ -126,12 +130,10 @@ bot = Cinch::Bot.new do
       @ring = false
       m.reply "Sin campanadas"
   end
-  @elfari_port = conf[:elfari][:port]
-  raise "Invalid elfari port" unless @elfari_port
-  @elfari_url = conf[:elfari][:url]
+  @elfari_url = ElFari::Config.config[:elfari][:url]
   raise "Invalid elfari url" unless @elfari_url
   
-  @mplayer_bin = conf[:mplayer]
+  @mplayer_bin = ElFari::Config.config[:mplayer]
   raise "Mplayer not present" if @mplayer_bin.nil?
   #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
     #RestClient.post "http://@elfari_url:@elfari_port/youtube", :url => query
@@ -142,9 +144,13 @@ bot = Cinch::Bot.new do
     #m.reply "Tomalo, chato: #{title}"
   #end
   on :message, /dimelo (.*)/ do |m, query|
+    @elfari_url = ElFari::Config.config[:elfari][:url]
+    @elfari_port = ElFari::Config.config[:elfari][:port]
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query
   end
   on :message, /in-inglis (.*)/ do |m, query|
+    @elfari_url = ElFari::Config.config[:elfari][:url]
+    @elfari_port = Elfari::Config.config[:elfari][:port]
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query, :voice => 'Alex'
   end
   on :message, /ayudame/ do |m|
@@ -159,6 +165,7 @@ bot = Cinch::Bot.new do
   end
   on :message, /vino/ do |m, query|
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
+    @mplayer_bin = ElFari::Config.config[:mplayer]
     if @mplayer.nil?
         @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
     else
@@ -169,6 +176,7 @@ bot = Cinch::Bot.new do
   on :message, /ponme\s*argo\s*(.*)/ do |m, query|
     db = File.readlines('database')
     play = db[(rand * (db.size - 1)).to_i].split(/ /)[0]
+    @mplayer_bin = ElFari::Config.config[:mplayer]
     flv = YoutubeDL::Downloader.url_flv(play)
     if @mplayer.nil?
        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
@@ -180,6 +188,7 @@ bot = Cinch::Bot.new do
   end
    on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
     flv = YoutubeDL::Downloader.url_flv(query)
+    @mplayer_bin = ElFari::Config.config[:mplayer]
     if @mplayer.nil?
         @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
     else
@@ -190,6 +199,7 @@ bot = Cinch::Bot.new do
   on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)\s*en\s*el\s*(.*)\s?/ do |m, query, seek|
     m.reply seek
     m.reply ElFariUtil.extract_seek_time(seek)
+    @mplayer_bin = ElFari::Config.config[:mplayer]
     flv = YoutubeDL::Downloader.url_flv(query)
     if @mplayer.nil?
         @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
@@ -206,6 +216,7 @@ bot = Cinch::Bot.new do
     db.each do |line|
       if line =~ /#{query}/i
         play = line.split(/ /)[0]
+        @mplayer_bin = ElFari::Config.config[:mplayer]
         flv = YoutubeDL::Downloader.url_flv(play)
         if @mplayer.nil?
            @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
@@ -233,6 +244,7 @@ bot = Cinch::Bot.new do
 
   on :message, /luego\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
       flv = YoutubeDL::Downloader.url_flv(query)
+      @mplayer_bin = ElFari::Config.config[:mplayer]
       if @mplayer.nil?
           @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
       else
@@ -259,6 +271,8 @@ bot = Cinch::Bot.new do
         rhyme["</rhyme>"] = ""
         rhyme["<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"] = ""
         m.reply "#{rhyme}"
+        @elfari_port = ElFari::Config.config[:elfari][:port]
+        @elfari_url = ElFari::Config.config[:elfari][:port]
         RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => "#{rhyme}"
   end
 

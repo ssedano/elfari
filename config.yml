@@ -19,6 +19,6 @@
 :timeout: 10000
 
 :elfari:
-  :url: localhost
+  :url: 'localhost'
   :port: 4567
 :mplayer: '/usr/bin/mplayer' 

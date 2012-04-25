@@ -18,6 +18,7 @@ require 'uri'
 require 'mplayer-ruby'
 require 'ruby-youtube-dl'
 require 'em-synchrony'
+require 'youtube_it'
 ##$SAFE = 4
 require File.dirname(__FILE__) + '/elfari_util'
 module ElFari
@@ -83,7 +84,7 @@ conf = ElFari::Config.config
 WeBee::Api.user = conf[:abiquo][:user]
 WeBee::Api.password = conf[:abiquo][:password]
 WeBee::Api.url = "http://#{conf[:abiquo][:host]}/api"
-
+@youtube = YouTubeIt::Client.new
 class ControlWS
   
   def self.say(text, voice = :spanish)
@@ -241,6 +242,24 @@ bot = Cinch::Bot.new do
       end
   end
 
+  on :message, /trame\s*(.*)/ do |m, query|
+      if @youtube.nil?
+          @youtube = YouTubeIt::Client.new
+      end
+      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
+      if video.nil?
+          m.reply "no veo el #{query}"
+      else
+          flv = YoutubeDL::Downloader.url_flv(video.player_url)
+          @mplayer_bin = ElFari::Config.config[:mplayer]
+          if @mplayer.nil?
+              @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+          else
+              @mplayer.load_file(flv)
+          end
+          m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url)
+      end
+  end
   on :message, /luego\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
       flv = YoutubeDL::Downloader.url_flv(query)
       @mplayer_bin = ElFari::Config.config[:mplayer]

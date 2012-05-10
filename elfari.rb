@@ -257,7 +257,7 @@ bot = Cinch::Bot.new do
           else
               @mplayer.load_file flv, :append
           end
-          m.reply "Aluego te pongo " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
+          m.reply "encolado " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
       end
   end
 on :message, /trame\s*(.*)/ do |m, query|
@@ -277,16 +277,6 @@ on :message, /trame\s*(.*)/ do |m, query|
           end
           m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
       end
-  end
-  on :message, /luego\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
-      flv = YoutubeDL::Downloader.url_flv(query)
-      @mplayer_bin = ElFari::Config.config[:mplayer]
-      if @mplayer.nil?
-          @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-      else
-          @mplayer.load_file flv, :append
-      end
-      m.reply "Luego te pongo " + YoutubeDL::Downloader.video_title(query)
   end
   on :message, /que\s*tiene/ do |m, query|
 	  db = File.readlines('database')

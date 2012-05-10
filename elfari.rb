@@ -242,7 +242,7 @@ bot = Cinch::Bot.new do
       end
   end
 
-  on :message, /luego\s*trame\s*(.*)/ do |m, query|
+  on :message, /aluego\s*(.*)/ do |m, query|
       if @youtube.nil?
           @youtube = YouTubeIt::Client.new
       end

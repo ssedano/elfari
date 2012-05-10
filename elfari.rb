@@ -257,7 +257,7 @@ bot = Cinch::Bot.new do
           else
               @mplayer.load_file flv, :append
           end
-          m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
+          m.reply "Aluego te pongo " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
       end
   end
 on :message, /trame\s*(.*)/ do |m, query|

@@ -242,7 +242,25 @@ bot = Cinch::Bot.new do
       end
   end
 
-  on :message, /trame\s*(.*)/ do |m, query|
+  on :message, /luego\s*trame\s*(.*)/ do |m, query|
+      if @youtube.nil?
+          @youtube = YouTubeIt::Client.new
+      end
+      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
+      if video.nil?
+          m.reply "no veo el #{query}"
+      else
+          flv = YoutubeDL::Downloader.url_flv(video.player_url)
+          @mplayer_bin = ElFari::Config.config[:mplayer]
+          if @mplayer.nil?
+              @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+          else
+              @mplayer.load_file flv, :append
+          end
+          m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
+      end
+  end
+on :message, /trame\s*(.*)/ do |m, query|
       if @youtube.nil?
           @youtube = YouTubeIt::Client.new
       end

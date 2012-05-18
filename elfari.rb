@@ -246,7 +246,7 @@ bot = Cinch::Bot.new do
     if @mplayer.nil?
         m.reply "No hay nada"
     else
-        @mplayer.next(1)
+        @mplayer.next(1, :force)
     end
   end
   on :message, /aluego\s*(.*)/ do |m, query|

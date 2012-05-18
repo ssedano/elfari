@@ -253,11 +253,16 @@ bot = Cinch::Bot.new do
       if @youtube.nil?
           @youtube = YouTubeIt::Client.new
       end
+      if /http:\/\//.match(query)
+          uri = query
+      else
       video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
-      if video.nil?
+          uri = video.player_url unless video.nil?
+      end
+      if uri.nil?
           m.reply "no veo el #{query}"
       else
-          flv = YoutubeDL::Downloader.url_flv(video.player_url)
+          flv = YoutubeDL::Downloader.url_flv(uri)
           @mplayer_bin = ElFari::Config.config[:mplayer]
           if @mplayer.nil?
               @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'

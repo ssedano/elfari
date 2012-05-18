@@ -242,6 +242,13 @@ bot = Cinch::Bot.new do
       end
   end
 
+  on :message, /quita\s*esta\s*mierda/ do |m, query|
+    if @mplayer.nil?
+        m.reply "No hay nada"
+    else
+        @mplayer.next(1)
+    end
+  end
   on :message, /aluego\s*(.*)/ do |m, query|
       if @youtube.nil?
           @youtube = YouTubeIt::Client.new

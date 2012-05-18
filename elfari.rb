@@ -250,6 +250,7 @@ bot = Cinch::Bot.new do
     end
   end
   on :message, /aluego\s*(.*)/ do |m, query|
+      length = "UNKNOWN LENGTH"
       if @youtube.nil?
           @youtube = YouTubeIt::Client.new
       end
@@ -269,7 +270,8 @@ bot = Cinch::Bot.new do
           else
               @mplayer.load_file flv, :append
           end
-          m.reply "encolado " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
+          length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
+          m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
       end
   end
 on :message, /trame\s*(.*)/ do |m, query|

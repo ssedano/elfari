@@ -144,6 +144,16 @@ bot = Cinch::Bot.new do
     #end
     #m.reply "Tomalo, chato: #{title}"
   #end
+  on :join do |m|
+    if m.user == @bot
+        flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
+        if @mplayer.nil?
+            @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+        else
+            @mplayer.load_file(flv)
+        end
+    end 
+  end 
   on :message, /dimelo (.*)/ do |m, query|
     @elfari_url = ElFari::Config.config[:elfari][:url]
     @elfari_port = ElFari::Config.config[:elfari][:port]

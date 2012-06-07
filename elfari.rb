@@ -154,7 +154,7 @@ bot = Cinch::Bot.new do
         end
     end 
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
-    @mplayer.load_file(flv)
+    @mplayer.load_file flv , :append
   end 
   on :message, /dimelo (.*)/ do |m, query|
     @elfari_url = ElFari::Config.config[:elfari][:url]

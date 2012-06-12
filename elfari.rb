@@ -161,6 +161,10 @@ bot = Cinch::Bot.new do
     @elfari_port = ElFari::Config.config[:elfari][:port]
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query
   end
+  on :message, /shh(.*)/ do |m, query|
+      @mplayer.pause unless @mplayer.nil?
+      m.reply "pausa"
+  end
   on :message, /in-inglis (.*)/ do |m, query|
     @elfari_url = ElFari::Config.config[:elfari][:url]
     @elfari_port = Elfari::Config.config[:elfari][:port]

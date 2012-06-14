@@ -6,6 +6,7 @@
 # gem install rest-client
 #
 $: << File.dirname(__FILE__) + "/modules"
+$LOAD_PATH << File.dirname(__FILE__) + '/plugins'
 require 'rubygems'
 require 'webee'
 require 'cinch'
@@ -21,6 +22,7 @@ require 'em-synchrony'
 require 'youtube_it'
 ##$SAFE = 4
 require File.dirname(__FILE__) + '/elfari_util'
+require File.dirname(__FILE__) + '/plugins/player'
 module ElFari
 
   class Config
@@ -84,7 +86,7 @@ conf = ElFari::Config.config
 WeBee::Api.user = conf[:abiquo][:user]
 WeBee::Api.password = conf[:abiquo][:password]
 WeBee::Api.url = "http://#{conf[:abiquo][:host]}/api"
-@youtube = YouTubeIt::Client.new
+
 class ControlWS
   
   def self.say(text, voice = :spanish)
@@ -106,7 +108,7 @@ bot = Cinch::Bot.new do
     c.server = conf[:server]
     c.channels = conf[:channels]
     c.nick = conf[:nick]
-    #c.plugins.plugins = [Motherfuckers]
+    c.plugins.plugins = [Plugins::Player]
     c.timeouts.connect = conf[:timeout]
   end
   scheduler = Rufus::Scheduler.start_new
@@ -144,26 +146,10 @@ bot = Cinch::Bot.new do
     #end
     #m.reply "Tomalo, chato: #{title}"
   #end
-  on :join do |m|
-    if m.user == @bot
-        flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
-        if @mplayer.nil?
-            @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-        else
-            @mplayer.load_file(flv)
-        end
-    end 
-    flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
-    @mplayer.load_file flv , :append
-  end 
   on :message, /dimelo (.*)/ do |m, query|
     @elfari_url = ElFari::Config.config[:elfari][:url]
     @elfari_port = ElFari::Config.config[:elfari][:port]
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/say", :text => query
-  end
-  on :message, /shh(.*)/ do |m, query|
-      @mplayer.pause unless @mplayer.nil?
-      m.reply "pausa"
   end
   on :message, /in-inglis (.*)/ do |m, query|
     @elfari_url = ElFari::Config.config[:elfari][:url]
@@ -173,151 +159,9 @@ bot = Cinch::Bot.new do
   on :message, /ayudame/ do |m|
     m.reply 'Ahi van los comandos, chavalote!: ayudame dimelo ponmelo volumen mele in-inglis ponmeargo ponmeer quetiene'
   end
-  on :message, /volumen\s*(\d*)/ do |m, query|
-        @mplayer.volume(:set, query.to_i * 10) unless @mplayer.nil?
-  end
   on :message, /mele/ do |m, query|
     RestClient.post "http://#{@elfari_url}:#{@elfari_port}/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
     m.reply "Paralo Paul!!!"
-  end
-  on :message, /vino/ do |m, query|
-    flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
-    @mplayer_bin = ElFari::Config.config[:mplayer]
-    if @mplayer.nil?
-        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-    else
-        @mplayer.load_file(flv)
-    end
-    m.reply "Viva el vino!!!"
-  end
-  on :message, /ponme\s*argo\s*(.*)/ do |m, query|
-    db = File.readlines('database')
-    play = db[(rand * (db.size - 1)).to_i].split(/ /)[0]
-    @mplayer_bin = ElFari::Config.config[:mplayer]
-    flv = YoutubeDL::Downloader.url_flv(play)
-    if @mplayer.nil?
-       @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-    else
-       @mplayer.load_file(flv)
-    end
-    title =YoutubeDL::Downloader.video_title(play) 
-    m.reply "Tomalo, chato: #{title}"
-  end
-   on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
-    flv = YoutubeDL::Downloader.url_flv(query)
-    @mplayer_bin = ElFari::Config.config[:mplayer]
-    if @mplayer.nil?
-        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
-    else
-        @mplayer.load_file(flv)
-    end
-    m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
-  end
-  on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)\s*en\s*el\s*(.*)\s?/ do |m, query, seek|
-    time = ElFariUtil.extract_seek_time(seek)
-    @mplayer_bin = ElFari::Config.config[:mplayer]
-    flv = YoutubeDL::Downloader.url_flv(query)
-    if @mplayer.nil?
-        @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null' #("-vo null -prefer-ipv4 ")
-    else
-        @mplayer.load_file(flv)
-    end
-    @mplayer.seek(time, :absolute) unless @mplayer.nil?
-    m.reply "Tomalo, chato: " + YoutubeDL::Downloader.video_title(query)
-  end
- 
-  on :message, /ponme\s*er\s*(.*)/ do |m, query|
-    db = File.readlines('database')
-    found = false
-    db.each do |line|
-      if line =~ /#{query}/i
-        play = line.split(/ /)[0]
-        @mplayer_bin = ElFari::Config.config[:mplayer]
-        flv = YoutubeDL::Downloader.url_flv(play)
-        if @mplayer.nil?
-           @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-        else
-           @mplayer.load_file(flv)
-        end
-        title =YoutubeDL::Downloader.video_title(play) 
-        m.reply "Tomalo, chato: #{title}"
-        found = true
-        break
-      end
-    end
-  	m.reply "No tengo er: #{query}" if !found
-  end
-
-  on :message, /apunta\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
-      title = YoutubeDL::Downloader.video_title(query)
-      if title.nil?
-          m.reply "No me suena"
-      else
-         File.open('database', 'a') { |n| n.puts "#{query} - #{title}\n"}
-         m.reply "#{title} en la base de datos"
-      end
-  end
-
-  on :message, /quita\s*esta\s*mierda/ do |m, query|
-    if @mplayer.nil?
-        m.reply "No hay nada"
-    else
-        @mplayer.next(1, :force)
-    end
-  end
-  on :message, /aluego\s*(.*)/ do |m, query|
-      length = "UNKNOWN LENGTH"
-      if @youtube.nil?
-          @youtube = YouTubeIt::Client.new
-      end
-      if /http:\/\//.match(query)
-          uri = query
-      else
-      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
-          uri = video.player_url unless video.nil?
-      end
-      if uri.nil?
-          m.reply "no veo el #{query}"
-      else
-          flv = YoutubeDL::Downloader.url_flv(uri)
-          @mplayer_bin = ElFari::Config.config[:mplayer]
-          if @mplayer.nil?
-              @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-          else
-              @mplayer.load_file flv, :append
-          end
-          length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
-          m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
-      end
-  end
-on :message, /trame\s*(.*)/ do |m, query|
-      if @youtube.nil?
-          @youtube = YouTubeIt::Client.new
-      end
-      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
-      if video.nil?
-          m.reply "no veo el #{query}"
-      else
-          flv = YoutubeDL::Downloader.url_flv(video.player_url)
-          @mplayer_bin = ElFari::Config.config[:mplayer]
-          if @mplayer.nil?
-              @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
-          else
-              @mplayer.load_file(flv)
-          end
-          m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
-      end
-  end
-  on :message, /que\s*tiene/ do |m, query|
-	  db = File.readlines('database')
-	  list = "Tengo esto piltrafa:\n"
-	  i=1
-	  db.each do |line|
-		  f=line.split(/ - /)[0].length + 3
-		  list += i.to_s() + " " + line[f..line.length]
-		  i+=1
-	  end
-	  m.reply "#{list}"
   end
 
   on :message, /rimamelo (.*)/ do |m, query|

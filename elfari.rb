@@ -5,8 +5,8 @@
 # gem install cinch
 # gem install rest-client
 #
-$: << File.dirname(__FILE__) + "/modules"
-$LOAD_PATH << File.dirname(__FILE__) + '/plugins'
+
+$: << File.dirname(__FILE__) + '/lib'
 require 'rubygems'
 require 'webee'
 require 'cinch'
@@ -14,21 +14,22 @@ require 'yaml'
 require 'rest-client'
 require 'alchemist'
 require 'rufus/scheduler'
-require 'abiquo-deployer'
+require 'modules/abiquo-deployer'
 require 'uri'
 require 'mplayer-ruby'
 require 'ruby-youtube-dl'
 require 'em-synchrony'
 require 'youtube_it'
+require 'plugins/player'
 ##$SAFE = 4
-require File.dirname(__FILE__) + '/elfari_util'
-require File.dirname(__FILE__) + '/plugins/player'
+require 'util/elfari_util'
+
 module ElFari
 
   class Config
 
     def self.config
-      YAML.load_file(File.expand_path(File.dirname(__FILE__)) + '/config.yml')
+      YAML.load_file(File.expand_path(File.dirname(__FILE__)) + '/config/config.yml')
     end
 
   end
@@ -136,8 +137,6 @@ bot = Cinch::Bot.new do
   @elfari_url = ElFari::Config.config[:elfari][:url]
   raise "Invalid elfari url" unless @elfari_url
   
-  @mplayer_bin = ElFari::Config.config[:mplayer]
-  raise "Mplayer not present" if @mplayer_bin.nil?
   #on :message, /ponmelo\s*(http:\/\/www\.youtube\.com.*)/ do |m, query|
     #RestClient.post "http://@elfari_url:@elfari_port/youtube", :url => query
     #title = RestClient.get('http://@elfari_url:@elfari_port/current_video')

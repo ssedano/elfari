@@ -11,77 +11,78 @@ require File.dirname(__FILE__) + '/../util/elfari_util'
 
 module Plugins
 
-class Config
-  def self.config
-      YAML.load_file(File.expand_path(File.dirname(__FILE__)) + '/../../config/config.yml')
-  end
-  
-end
-
 class Player
   include Cinch::Plugin
 
   attr_reader :pid
 
-
+  match /shh/, method: :pause, :use_prefix => false
+  match /volumen\s*(\d*)/, method: :volume, :use_prefix => false
+  match /quita esta mierda/, method: :next_song, :use_prefix => false
+  match /apunta\s*(.+)/, method: :add_song_db, :use_prefix => false
+  match /vino/, method: :wine, :use_prefix => false
+  match /que\stiene/, method: :list, :use_prefix => false
+  match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
+  match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
+  match /trame\s*(.*)/, method: :trame, :use_prefix => false
+	  
   def initialize(*args)
     super
     @youtube = YouTubeIt::Client.new if @youtube.nil?
 
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
-    @mplayer_bin = Plugins::Config.config['mplayer']
 
-    if @mplayer_bin.nil?
+    if config[:mplayer_bin].nil?
       @mplayer = MPlayer::Slave.new flv, :singleton => true, :vo => 'null'
     else
-      @mplayer = MPlayer::Slave.new flv, :path => @mplayer_bin, :singleton => true, :vo => 'null'
+      @mplayer = MPlayer::Slave.new flv, :path => config[:mplayer_bin], :singleton => true, :vo => 'null'
     end
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
     @mplayer.load_file flv , :append
     @pid = @mplayer.pid
   end
   
-  match /shh/, method: :pause, :use_prefix => false
+  listen_to :join
+  def execute(m, query)
+    flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
+    @mplayer.load_file flv , :append
+  end
+  
   def pause(m)
     @mplayer.pause
     m.reply "pausa"
   end
-
-  match /volumen\s*(\d*)/, method: :volume, :use_prefix => false
-  def volume(query)
+  
+  def volume(m, query)
     @mplayer.volume(:set, query.to_i * 10)
   end
-
-  match /quita esta mierda/, method: :next_song, :use_prefix => false
-  def next_song()
+  
+  def next_song(m)
     @mplayer.next(1, :force)
   end
 
-
-
-  match /apunta\s*(.*)/, method: :add_song_db, :use_prefix => false
   def add_song_db(m, query)
-    title = YoutubeDL::Downloader.video_title(query)
-      if title.nil?
-          m.reply "No me suena"
+      if query.match(/^http/)
+        title = YoutubeDL::Downloader.video_title(query)
+        if title.nil?
+           m.reply "No me suena"
+        else
+          File.open('config/db/database', 'a') { |n| n.puts "#{query} - #{title}\n"}
+          m.reply "#{title} en la base de datos"
+        end
       else
-         File.open('database', 'a') { |n| n.puts "#{query} - #{title}\n"}
-         m.reply "#{title} en la base de datos"
+          m.reply "eso no es una uri"
       end
   end
-
-
-
-  match /vino(.*)/, method: :wine, :use_prefix => false
+  
   def wine(m)
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
     @mplayer.load_file(flv)
     m.reply "Viva el vino!!!"
   end
 
-  match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
   def play_known(m, query)
-    db = File.readlines('database')
+    db = File.readlines('config/db/database')
     found = false
     db.each do |line|
       if line =~ /#{query}/i
@@ -96,12 +97,9 @@ class Player
     end
   	m.reply "No tengo er: #{query}" if !found
   end
-
-
-
-  match /que\stiene/, method: :list, :use_prefix => false
+  
   def list(m)
-    db = File.readlines('database')
+    db = File.readlines('config/db/database')
     list = "Tengo esto piltrafa:\n"
     i=1
     db.each do |line|
@@ -112,7 +110,6 @@ class Player
 	m.reply "#{list}"
   end
   
-  match /trame\s*(.*)/, method: :trame, :use_prefix => false
   def trame(m, query)
       video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
       if video.nil?
@@ -124,10 +121,8 @@ class Player
       end
   end
   
-  match /aluego\s*(.*)/, method: :excute_aluego, :use_prefix => false
   def execute_aluego(m, query)
     length = "UNKNOWN LENGTH"
-    
     if /http:\/\//.match(query)
       uri = query
     else
@@ -143,12 +138,5 @@ class Player
       m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
     end
   end
-
-  listen_to :join
-  def execute(m, query)
-    flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
-    @mplayer.load_file flv , :append
-  end
-
 end
 end

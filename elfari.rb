@@ -16,10 +16,7 @@ require 'alchemist'
 require 'rufus/scheduler'
 require 'modules/abiquo-deployer'
 require 'uri'
-require 'mplayer-ruby'
-require 'ruby-youtube-dl'
 require 'em-synchrony'
-require 'youtube_it'
 require 'plugins/player'
 ##$SAFE = 4
 require 'util/elfari_util'
@@ -110,8 +107,11 @@ bot = Cinch::Bot.new do
     c.channels = conf[:channels]
     c.nick = conf[:nick]
     c.plugins.plugins = [Plugins::Player]
+    c.plugins.options[Plugins::Player]  = { :mplayer_bin => ElFari::Config.config[:mplayer] }
     c.timeouts.connect = conf[:timeout]
+    c.verbose = true
   end
+ 
   scheduler = Rufus::Scheduler.start_new
   
   @ring = false 

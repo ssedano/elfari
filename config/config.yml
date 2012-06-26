@@ -22,3 +22,6 @@
   :url: 'localhost'
   :port: 4567
 :mplayer: '/usr/bin/mplayer' 
+
+
+:database: 'config/db/database'

@@ -107,7 +107,8 @@ bot = Cinch::Bot.new do
     c.channels = conf[:channels]
     c.nick = conf[:nick]
     c.plugins.plugins = [Plugins::Player]
-    c.plugins.options[Plugins::Player]  = { :mplayer_bin => ElFari::Config.config[:mplayer] }
+    c.plugins.options[Plugins::Player]  = { :mplayer_bin => ElFari::Config.config[:mplayer],
+                                            :database => "#{File.expand_path(File.dirname(__FILE__))}/#{ElFari::Config.config[:database]}" }
     c.timeouts.connect = conf[:timeout]
     c.verbose = true
   end

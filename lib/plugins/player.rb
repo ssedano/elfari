@@ -31,7 +31,8 @@ class Player
     @youtube = YouTubeIt::Client.new if @youtube.nil?
 
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
-
+    @db_song = config[:database]
+    puts @db_song
     if config[:mplayer_bin].nil?
       @mplayer = MPlayer::Slave.new flv, :singleton => true, :vo => 'null'
     else
@@ -67,7 +68,7 @@ class Player
         if title.nil?
            m.reply "No me suena"
         else
-          File.open('config/db/database', 'a') { |n| n.puts "#{query} - #{title}\n"}
+          File.open(@db_song, 'a') { |n| n.puts "#{query} - #{title}\n"}
           m.reply "#{title} en la base de datos"
         end
       else
@@ -82,7 +83,7 @@ class Player
   end
 
   def play_known(m, query)
-    db = File.readlines('config/db/database')
+    db = File.readlines(@db_song)
     found = false
     db.each do |line|
       if line =~ /#{query}/i
@@ -99,7 +100,7 @@ class Player
   end
   
   def list(m)
-    db = File.readlines('config/db/database')
+    db = File.readlines(@db_song)
     list = "Tengo esto piltrafa:\n"
     i=1
     db.each do |line|

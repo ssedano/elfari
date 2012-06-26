@@ -32,7 +32,6 @@ class Player
 
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
     @db_song = config[:database]
-    puts @db_song
     if config[:mplayer_bin].nil?
       @mplayer = MPlayer::Slave.new flv, :singleton => true, :vo => 'null'
     else
@@ -101,14 +100,11 @@ class Player
   
   def list(m)
     db = File.readlines(@db_song)
-    list = "Tengo esto piltrafa:\n"
-    i=1
+    
+    m.reply "Tengo esto piltrafa:\n"
     db.each do |line|
-      f=line.split(/ - /)[0].length + 3
-      list += i.to_s() + " " + line[f..line.length]
-      i+=1
+      m.reply line
     end
-	m.reply "#{list}"
   end
   
   def trame(m, query)

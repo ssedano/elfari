@@ -25,3 +25,6 @@
 
 
 :database: 'config/db/database'
+
+:melee:
+  :channel: "#foobarslkj chan-key"

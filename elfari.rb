@@ -18,6 +18,7 @@ require 'modules/abiquo-deployer'
 require 'uri'
 require 'em-synchrony'
 require 'plugins/player'
+require 'plugins/melee'
 ##$SAFE = 4
 require 'util/elfari_util'
 
@@ -106,27 +107,16 @@ bot = Cinch::Bot.new do
     c.server = conf[:server]
     c.channels = conf[:channels]
     c.nick = conf[:nick]
-    c.plugins.plugins = [Plugins::Player]
-    c.plugins.options[Plugins::Player]  = { :mplayer_bin => ElFari::Config.config[:mplayer],
-                                            :database => "#{File.expand_path(File.dirname(__FILE__))}/#{ElFari::Config.config[:database]}" }
+    c.plugins.plugins = [Plugins::Player, 
+                         Plugins::Melee]
+    
+    
+    c.plugins.options= { Plugins::Player => { :mplayer_bin => ElFari::Config.config[:mplayer],
+                                            :database => "#{File.expand_path(File.dirname(__FILE__))}/#{ElFari::Config.config[:database]}" },
+                         Plugins::Melee => { :channel => ElFari::Config.config[:melee][:channel] }}
     c.timeouts.connect = conf[:timeout]
     c.verbose = true
   end
- 
-  scheduler = Rufus::Scheduler.start_new
-  
-  @ring = false 
-  def bells
-      ElFari::Config.config[:channels].each do |c|
-          Channel(c.split.first).send "Son las #{Time.new.hour}"
-      end
-      Time.new.hour.times { %x[beep  2&>1 && sleep 1]} if @ring
-  end
-
-  scheduler.cron '0 * * * *' do
-      bells
-  end
-
   on :message, /\s*con campanadas\s*/ do |m, query|
       @ring = true
       m.reply "Las horas con beeps, para desactivarlo: s/con/sin/"

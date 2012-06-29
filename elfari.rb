@@ -149,11 +149,6 @@ bot = Cinch::Bot.new do
   on :message, /ayudame/ do |m|
     m.reply 'Ahi van los comandos, chavalote!: ayudame dimelo ponmelo volumen mele in-inglis ponmeargo ponmeer quetiene'
   end
-  on :message, /mele/ do |m, query|
-    RestClient.post "http://#{@elfari_url}:#{@elfari_port}/video", :url => 'http://gobarbra.com/hit/new-0416a9aa8de56543b149d7ffb477196f'
-    m.reply "Paralo Paul!!!"
-  end
-
   on :message, /rimamelo (.*)/ do |m, query|
   	uri = "http://rimamelo.herokuapp.com/web/api?model.rhyme=#{URI.escape(query)}"
         rhyme = RestClient.get(uri)

@@ -21,7 +21,7 @@
 :elfari:
   :url: 'localhost'
   :port: 4567
-:mplayer: '/usr/bin/mplayer' 
+:mplayer: '/opt/local/bin/mplayer' 
 
 
 :database: 'config/db/database'

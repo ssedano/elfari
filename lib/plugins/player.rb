@@ -25,7 +25,9 @@ class Player
   match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
   match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
   match /trame\s*(.*)/, method: :trame, :use_prefix => false
-	  
+
+  match /melee time/, method: :melee, :use_prefix => false
+
   def initialize(*args)
     super
     @youtube = YouTubeIt::Client.new if @youtube.nil?
@@ -134,6 +136,11 @@ class Player
       length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
       m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
     end
+  end
+
+  def melee(m)
+      puts m
+      play_known(m, 'franzl yodlling')
   end
 end
 end

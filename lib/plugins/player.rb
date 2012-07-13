@@ -25,7 +25,7 @@ class Player
   match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
   match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
   match /trame\s*(.*)/, method: :trame, :use_prefix => false
-
+  match /ponmelo.*/, method: :deprecated, :use_prefix => false
   match /melee time/, method: :melee, :use_prefix => false
 
   def initialize(*args)
@@ -141,6 +141,10 @@ class Player
   def melee(m)
       puts m
       play_known(m, 'franzl yodlling')
+  end
+
+  def deprecated(m)
+      m.reply "esta pasado de moda, mejor encola la cancion con aluego"
   end
 end
 end

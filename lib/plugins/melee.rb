@@ -1,24 +1,22 @@
 require 'cinch'
 require 'rufus/scheduler'
-
+require 'rubygems'
 module Plugins
     class Melee
         include Cinch::Plugin
-        def initialize(*args)
+           def initialize(*args)
 
-           super            
-           @channel = config[:channel]
-           puts @channel
-           raise "channel name is mandatory" if @channel.nil?
-           scheduler = Rufus::Scheduler.start_new
-           scheduler.cron '0 12 17 * *' do
-              melee
-           end
-        end
-      
-        def melee
-           Channel(@channel.split.first).send "Son las #{Time.new.hour}, melee time!"
-        end
+             super            
+             @channel = config[:channel]
+             puts @channel
+             raise "channel name is mandatory" if @channel.nil?
+    
+             scheduler = Rufus::Scheduler.start_new
+             scheduler.every '4s' do
+               puts "mele"
+             end
+          end
+
     end
 
 

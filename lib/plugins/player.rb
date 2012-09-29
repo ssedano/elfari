@@ -27,6 +27,9 @@ class Player
   match /trame\s*(.*)/, method: :trame, :use_prefix => false
   match /ponmelo.*/, method: :deprecated, :use_prefix => false
   match /melee time/, method: :melee, :use_prefix => false
+  match /a cuanto/, method: :get_volume, :use_prefix => false
+  match /volumen\+\+/, method: :increase_volume, :use_prefix => false
+  match /volume--/, method: :decrease_volume, :use_prefix => false
 
   def initialize(*args)
     super
@@ -58,7 +61,22 @@ class Player
   def volume(m, query)
     @mplayer.volume(:set, query.to_i * 10)
   end
-  
+  def increase_volume(m)
+      volume = @mplayer.get_property('volume')
+      if volume.nil? or volume == ""
+          volume = 1
+      end
+      volume = (volume.to_i/10) + 1
+      volume(m, volume)
+  end
+  def decrease_volume(m)
+      volume = @mplayer.get_property('volume')
+      if volume.nil? or volume == ""
+          volume = 1
+      end
+      volume = (volume.to_i/10) - 1
+      @mplayer.volume(m, volume)
+  end
   def next_song(m)
     @mplayer.next(1, :force)
   end
@@ -139,8 +157,17 @@ class Player
   end
 
   def melee(m)
-      puts m
       play_known(m, 'franzl yodlling')
+  end
+
+  def get_volume(m)
+      volume = @mplayer.get_property('volume')
+      puts volume 
+      if volume.nil? or volume == ""
+         m.reply "Ahora no esta sonando nada!"
+      else 
+          m.reply "el volume: #{volume.to_i / 10}"
+      end
   end
 
   def deprecated(m)

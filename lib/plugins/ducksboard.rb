@@ -1,25 +1,39 @@
 require 'cinch'
-
+require 'Ducksboard'
 
 module Plugins
-    class Ducksboard
+    class DucksboardPlugin
         include Cinch::Plugin
         def initialize(*args)
 
-            @token = config[:ducksboard_token]
-
-            @board = "https://push.ducksboard.com/v/#{config[:board]}"
-            @playlist = "https://push.ducksboard.com/v/#{config[:playlist]}"
-
+            super
+            @API = Ducksboard
+            @API.api_key = config[:ducksboard_token]
+            @board = @API::Leaderboard.new(config[:board])
+       
+            @leaders = @board.last_values(1)["data"][0]["value"]
+            @leaders = @leaders["board"] if @leaders.has_key?("board")      
+            puts @leaders
+            @leaders=  @leaders.to_a 
         end
 
+        listen_to :join
+        react_on :channel
 
-        match /Toma chato/, :method :add_song, :use_prefix => false
-        match /^aluego/, :method :up, :use_prefix => false
-        match /^trame/, :method :up, :use_prefix => false
-        match /quita esta mierda/, :method :down, :use_prefix => false
-
+        def listen(m)
+            if m.user.nick == bot.nick
+                m.channel.users.each { |a,b| @leaders.insert(0, {"name" => a.nick, "values" => [0, 0, 0]}) unless @leaders.each { |l| l["name"] == a.nick}} 
+                puts "no #{@leaders }" 
+            else
+                #@leaders = { "name" => m.user.nick, "values" => [0, 0, 0]}) unless @leaders.find { |l| l.values[0] == m.user.nick }  
+            end
+           
+           @board.linha = @leaders 
+          puts @board 
+            @board.save 
+        end
         def add_song(m)
+
         end
         def up(m)
         end
@@ -28,3 +42,6 @@ module Plugins
         end
     end
 end
+
+
+

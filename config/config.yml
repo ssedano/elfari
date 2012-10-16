@@ -9,11 +9,9 @@
 :gitdude:
   :repos:
     - :name: Abiquo
-      :path: '/Users/rubiojr/git/abiquo'
-    - :name: Abiquo Enterprise
-      :path: '/Users/rubiojr/git/abiquo-enterprise'
+      :path: '~/repos/platform'
         
-:nick: elfari2
+:nick: elfari
 :channels:
   - "#foobarslkj chan-key"
 :timeout: 10000
@@ -21,6 +19,8 @@
 :elfari:
   :url: 'localhost'
   :port: 4567
+
+
 :mplayer: '/opt/local/bin/mplayer' 
 
 
@@ -28,3 +28,9 @@
 
 :melee:
   :channel: "#foobarslkj chan-key"
+
+:vlc:
+  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
+  :host: 'localhost'
+  :port: 4000
+  :args: '--ignore-config -I lua --lua-intf cli --no-video' 

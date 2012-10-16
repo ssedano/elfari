@@ -16,11 +16,10 @@ require 'uri'
 require 'em-synchrony'
 require 'plugins/player'
 require 'plugins/melee'
-require 'plugins/ducksboard'
 require 'plugins/git'
 require 'plugins/mothership'
 require 'plugins/say'
-
+require 'plugins/vlc'
 ##$SAFE = 4
 require 'util/elfari_util'
 
@@ -51,20 +50,22 @@ bot = Cinch::Bot.new do
     c.server = config[:server]
     c.channels = config[:channels]
     c.nick = config[:nick]
-    c.plugins.plugins = [Plugins::Player, 
+    c.plugins.plugins = [Plugins::VLC, 
                          Plugins::Melee,
-                         Plugins::DucksboardPlugin,
                          Plugins::GitDude,
                          Plugins::Say, 
                          Plugins::Mothership] 
     
-    c.plugins.options= { Plugins::Player => { :mplayer_bin => config[:mplayer],
-                                            :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
-                         Plugins::Melee => { :channel => config[:melee][:channel] }, 
-                         Plugins::DucksboardPlugin => { :ducksboard_token => config[:ducksboard][:api_key], :board => config[:ducksboard][:leaderboard]},
-                         Plugins::Mothership => { :api_user => config[:abiquo][:user],
-                                                  :api_password => config[:abiquo][:password],
-                                                  :ip => config[:abiquo][:host] }} 
+    c.plugins.options= { 
+      #Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
+        Plugins::VLC => { :bin => config[:vlc][:bin],
+                          :port => config[:vlc][:port],
+                          :args => config[:vlc][:args],
+                          :host => config[:vlc][:host] },
+        Plugins::Melee => { :channel => config[:melee][:channel] }, 
+        Plugins::Mothership => { :api_user => config[:abiquo][:user],
+                                 :api_password => config[:abiquo][:password],
+                                 :ip => config[:abiquo][:host] }} 
     c.timeouts.connect = config[:timeout]
     c.verbose = true
   end

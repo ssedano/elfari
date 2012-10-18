@@ -26,8 +26,10 @@ class VLC
   match /ponmelo.*/, method: :deprecated, :use_prefix => false
   match /melee time/, method: :melee, :use_prefix => false
   match /a cuanto/, method: :get_volume, :use_prefix => false
-  match /volumen\+\+/, method: :increase_volume, :use_prefix => false
-  match /volume--/, method: :decrease_volume, :use_prefix => false
+  match /^volumen\+\+$/, method: :increase_volume, :use_prefix => false
+  match /^volume--$/, method: :decrease_volume, :use_prefix => false
+  match /^dale$/, method: :play, :use_prefix => false
+
 
   def initialize(*args)
     super
@@ -38,7 +40,7 @@ class VLC
     
     config[:host] ||= 'localhost'
     config[:port] ||= 1234
-    config[:args] ||= '--no-video -I lua --lua-intf cli'
+    config[:args] ||= '--no-video -I lua --lua-intf cli --ignore-config'
     if config[:bin].nil?
       @vlc = VLCRC::VLC.new config[:host], config[:port], config[:args]
     else
@@ -53,9 +55,11 @@ class VLC
     end
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
     
-    
-    @vlc.add_stream = windows
-    @vlc.add_stream = flv
+
+    @vlc.clear_playlist
+
+    @vlc.add_stream  windows
+    @vlc.add_stream  flv
     @vlc.playing = true
     
   end
@@ -72,23 +76,23 @@ class VLC
   end
   
   def volume(m, query)
-    @vlc.volume(:set, query.to_i * 10)
+    @vlc.volume=query.to_i * 10
   end
   def increase_volume(m)
-      volume = @vlc.get_property('volume')
-      if volume.nil? or volume == ""
-          volume = 1
+      vol = @vlc.volume
+      if vol.nil? or vol == ""
+          vol = 1
       end
-      volume = (volume.to_i/10) + 1
-      volume(m, volume)
+      vol = (vol.to_i/10) + 1
+      volume(m, vol)
   end
   def decrease_volume(m)
-      volume = @vlc.get_property('volume')
-      if volume.nil? or volume == ""
-          volume = 1
+      vol = @vlc.volume
+      if vol.nil? or vol == ""
+          vol = 1
       end
-      volume = (volume.to_i/10) - 1
-      @vlc.volume(m, volume)
+      vol = (vol.to_i/10) - 1
+      @vlc.volume(m, vol)
   end
   def next_song(m)
     @vlc.next
@@ -110,7 +114,7 @@ class VLC
   
   def wine(m)
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
-    @vlc.stream = flv
+    @vlc.stream=  flv
     m.reply "Viva el vino!!!"
   end
 
@@ -148,6 +152,7 @@ class VLC
           flv = YoutubeDL::Downloader.url_flv(video.player_url)
           @vlc.stream= flv
           m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
+          @vlc.playing=true
       end
   end
   
@@ -166,6 +171,7 @@ class VLC
       @vlc.add_stream flv
       length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
       m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
+      @vlc.playing=true
     end
   end
 
@@ -174,12 +180,11 @@ class VLC
   end
 
   def get_volume(m)
-      volume = @vlc.get_property('volume')
-      puts volume 
-      if volume.nil? or volume == ""
+      vol = @vlc.volume
+      if vol.nil? or vol == ""
          m.reply "Ahora no esta sonando nada!"
       else 
-          m.reply "el volume: #{volume.to_i / 10}"
+          m.reply "el volume: #{vol.to_i / 10}"
       end
   end
 
@@ -187,5 +192,9 @@ class VLC
       m.reply "esta pasado de moda, mejor encola la cancion con aluego"
   end
 
+
+  def play()
+    @vlc.playing=true
+  end
 end
 end

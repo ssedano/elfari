@@ -1,9 +1,7 @@
 source "http://rubygems.org"
 
-gem "fog"
 gem "cinch"
-gem "sinatra"
-gem "webee"
-gem "rufus-scheduler"
 gem "rest-client"
 gem "ruby-youtube-dl"
+gem "mplayer-ruby"
+gem "youtube_it"

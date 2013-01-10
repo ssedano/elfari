@@ -67,7 +67,12 @@ module Plugins
     listen_to :join
     def listen(m)
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
-      @vlc.add_stream flv
+      if @vlc.playing
+        @vlc.add_stream flv
+      else
+        @vlc.clear_playlist
+        @vlc.stream= flv
+      end
     end
 
     def pause(m)
@@ -125,7 +130,12 @@ module Plugins
         if line =~ /#{query}/i
           play = line.split(/ /)[0]
           flv = YoutubeDL::Downloader.url_flv(play)
-          @vlc.add_stream flv
+          if @vlc.playing
+            @vlc.add_stream flv
+          else
+            @vlc.clear_playlist
+            @vlc.stream=flv
+          end
           title =YoutubeDL::Downloader.video_title(play) 
           m.reply "Tomalo, chato: #{title}"
           found = true
@@ -152,6 +162,7 @@ module Plugins
         m.reply "no veo el #{query}"
       else
         flv = YoutubeDL::Downloader.url_flv(video.player_url)
+        @vlc.clear_playlist
         @vlc.stream= flv
         m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
         @vlc.playing=true
@@ -170,7 +181,12 @@ module Plugins
         m.reply "no veo el #{query}"
       else
         flv = YoutubeDL::Downloader.url_flv(uri)
-        @vlc.add_stream flv
+        if @vlc.playing
+          @vlc.add_stream flv
+        else
+          @vlc.clear_playlist
+          @vlc.stream= flv
+        end
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
         m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
         @vlc.playing=true
@@ -194,12 +210,17 @@ module Plugins
       m.reply "esta pasado de moda, mejor encola la cancion con aluego"
     end
     def play_known_random(m)
-      db = File.readlines(@db)
+      db = File.readlines(@db_song)
       return unless db
       song = db.at(Random.rand(db.length)) 
       play = song.split(/ /)[0]
       flv = YoutubeDL::Downloader.url_flv(play)
-      @vlc.add_stream flv
+      if @vlc.playing
+        @vlc.add_stream flv
+      else
+        @vlc.clear_playlist
+        @vlc.stream=flv
+      end
       title =YoutubeDL::Downloader.video_title(play) 
       m.reply "Tomalo, chato: #{title}"
       @vlc.playing=true

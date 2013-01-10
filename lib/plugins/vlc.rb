@@ -29,7 +29,7 @@ class VLC
   match /^volumen\+\+$/, method: :increase_volume, :use_prefix => false
   match /^volume--$/, method: :decrease_volume, :use_prefix => false
   match /^dale$/, method: :play, :use_prefix => false
-
+  match /^ponme argo\s*(.*)/, method: :play_known_random, :use_prefix => false
 
   def initialize(*args)
     super
@@ -191,7 +191,17 @@ class VLC
   def deprecated(m)
       m.reply "esta pasado de moda, mejor encola la cancion con aluego"
   end
-
+  def play_known_random(m)
+    db = File.readlines(@db)
+    return unless db
+    song = db.at(Random.rand(db.length)) 
+    play = song.split(/ /)[0]
+    flv = YoutubeDL::Downloader.url_flv(play)
+    @vlc.add_stream flv
+    title =YoutubeDL::Downloader.video_title(play) 
+    m.reply "Tomalo, chato: #{title}"
+    @vlc.playing=true
+  end
 
   def play()
     @vlc.playing=true

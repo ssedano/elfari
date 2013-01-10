@@ -14,8 +14,6 @@ require 'rest-client'
 require 'alchemist'
 require 'uri'
 require 'em-synchrony'
-require 'plugins/player'
-require 'plugins/mothership'
 require 'plugins/say'
 require 'plugins/vlc'
 ##$SAFE = 4
@@ -38,6 +36,8 @@ if RUBY_VERSION =~ /1.9/
   Encoding.default_internal = Encoding::UTF_8
 end
 
+config = ElFari::Config.config
+
 bot = Cinch::Bot.new do
   configure do |c|
     c.server = config[:server]
@@ -51,7 +51,8 @@ bot = Cinch::Bot.new do
         Plugins::VLC => { :bin => config[:vlc][:bin],
                           :port => config[:vlc][:port],
                           :args => config[:vlc][:args],
-                          :host => config[:vlc][:host] }}
+                          :host => config[:vlc][:host],
+                          :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" }}
     c.timeouts.connect = config[:timeout]
     c.verbose = true
   end

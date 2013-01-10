@@ -30,7 +30,7 @@
   :channel: "#foobarslkj chan-key"
 
 :vlc:
-  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
+  :bin: '/usr/bin/vlc'
   :host: 'localhost'
   :port: 4000
   :args: '--ignore-config -I lua --lua-intf cli --no-video' 

@@ -65,7 +65,7 @@ class VLC
   end
   
   listen_to :join
-  def execute(m, query)
+  def listen(m)
     flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
     @vlc.add_stream flv
   end
@@ -76,14 +76,14 @@ class VLC
   end
   
   def volume(m, query)
-    @vlc.volume=query.to_i * 10
+    @vlc.volume=query.to_i
   end
   def increase_volume(m)
       vol = @vlc.volume
       if vol.nil? or vol == ""
           vol = 1
       end
-      vol = (vol.to_i/10) + 1
+      vol = vol.to_i + 10
       volume(m, vol)
   end
   def decrease_volume(m)
@@ -91,7 +91,7 @@ class VLC
       if vol.nil? or vol == ""
           vol = 1
       end
-      vol = (vol.to_i/10) - 1
+      vol = vol.to_i - 10
       @vlc.volume(m, vol)
   end
   def next_song(m)
@@ -184,7 +184,7 @@ class VLC
       if vol.nil? or vol == ""
          m.reply "Ahora no esta sonando nada!"
       else 
-          m.reply "el volume: #{vol.to_i / 10}"
+          m.reply "el volume: #{vol.to_i}"
       end
   end
 

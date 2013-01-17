@@ -75,6 +75,12 @@ module Plugins
       end
     end
 
+    listen_to :disconnect
+    def disconnect(m)
+      @vlc.stream= @internet_song
+      @vlc.playing= true
+    end
+
     def pause(m)
       @vlc.pause
       m.reply "pausa"
@@ -194,7 +200,7 @@ module Plugins
     end
 
     def melee(m)
-      play_known(m, 'franzl yodlling')
+      play_known(m, 'franzl')
     end
 
     def get_volume(m)

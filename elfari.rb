@@ -52,7 +52,8 @@ bot = Cinch::Bot.new do
                           :port => config[:vlc][:port],
                           :args => config[:vlc][:args],
                           :host => config[:vlc][:host],
-                          :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" }}
+                          :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
+                          :internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" }}
     c.timeouts.connect = config[:timeout]
     c.verbose = true
   end

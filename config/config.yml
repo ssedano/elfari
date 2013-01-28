@@ -32,7 +32,10 @@
 :internet_song: 'config/tracks/internet_down.ogg'
 
 :vlc:
-  :bin: '/usr/bin/vlc'
+  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
   :host: 'localhost'
   :port: 4000
   :args: '--ignore-config -I lua --lua-intf cli --no-video' 
+
+:mpd_url: 'localhost'
+:mpd_port: 6600

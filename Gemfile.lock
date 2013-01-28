@@ -44,3 +44,6 @@ DEPENDENCIES
   rest-client
   ruby-youtube-dl
   youtube_it
+  vlcrc
+  alchemist
+  em-synchrony

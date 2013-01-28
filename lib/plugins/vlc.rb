@@ -35,7 +35,6 @@ module Plugins
       super
       @youtube = YouTubeIt::Client.new if @youtube.nil?
 
-      windows = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
       @db_song = config[:database]
 
       config[:host] ||= 'localhost'
@@ -53,30 +52,28 @@ module Plugins
         sleep 0.1
         @vlc.connect
       end
-      flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
-
 
       @vlc.clear_playlist
 
-      @vlc.add_stream  windows
-      @vlc.add_stream  flv
+      @vlc.add_stream  'http://www.youtube.com/watch?v=7nQ2oiVqKHw'
+      @vlc.add_stream  'http://www.youtube.com/watch?v=1CiqkIyw-mA'
       @vlc.playing = true
 
     end
 
     listen_to :join
     def listen(m)
-      flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       if @vlc.playing
-        @vlc.add_stream flv
+        @vlc.add_stream 'http://www.youtube.com/watch?v=1CiqkIyw-mA'
       else
         @vlc.clear_playlist
-        @vlc.stream= flv
+        @vlc.stream= 'http://www.youtube.com/watch?v=1CiqkIyw-mA'
       end
     end
 
-    listen_to :disconnect
-    def disconnect(m)
+    listen_to :disconnect, method: :inet_down
+    def inet_down(m)
+      puts @internet_song 
       @vlc.stream= @internet_song
       @vlc.playing= true
     end
@@ -124,8 +121,7 @@ module Plugins
     end
 
     def wine(m)
-      flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
-      @vlc.stream=  flv
+      @vlc.stream= 'http://www.youtube.com/watch?v=-nQgsEbU9C4'
       m.reply "Viva el vino!!!"
     end
 
@@ -167,9 +163,8 @@ module Plugins
       if video.nil?
         m.reply "no veo el #{query}"
       else
-        flv = YoutubeDL::Downloader.url_flv(video.player_url)
         @vlc.clear_playlist
-        @vlc.stream= flv
+        @vlc.stream=video.player_url 
         m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
         @vlc.playing=true
       end
@@ -186,15 +181,14 @@ module Plugins
       if uri.nil?
         m.reply "no veo el #{query}"
       else
-        flv = YoutubeDL::Downloader.url_flv(uri)
         if @vlc.playing
-          @vlc.add_stream flv
+          @vlc.add_stream uri
         else
           @vlc.clear_playlist
-          @vlc.stream= flv
+          @vlc.stream= uri
         end
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
-        m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
+        m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " #{uri} (#{length})"
         @vlc.playing=true
       end
     end

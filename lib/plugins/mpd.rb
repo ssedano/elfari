@@ -44,7 +44,7 @@ module Plugins
     end
 
     listen_to :join
-    def listen(m, query)
+    def listen(m)
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       @mpd.add flv
     end

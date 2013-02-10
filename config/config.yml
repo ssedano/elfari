@@ -39,3 +39,7 @@
 
 :mpd_url: 'localhost'
 :mpd_port: 6600
+
+:twitter:
+  :screen_name: 'telorimo'
+  :channel: '#foobarslkj'

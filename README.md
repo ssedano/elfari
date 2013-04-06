@@ -53,5 +53,5 @@ The most rewarding ones are:
 
 The original project (which I owe a PR) was created by [rubiojr](https://github.com/rubiojr).
 
-His work has his license. Mine is under the [Beerware License](http://en.wikipedia.org/Beerware).
+His work has his license. Mine is under the [Beerware License](http://en.wikipedia.org/wiki/Beerware).
 

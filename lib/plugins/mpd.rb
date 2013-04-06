@@ -11,7 +11,7 @@ require File.dirname(__FILE__) + '/../util/elfari_util'
 
 module Plugins
 
-  class Mpd
+  class MPD
     include Cinch::Plugin
 
     match /shh/, method: :pause, :use_prefix => false
@@ -29,6 +29,7 @@ module Plugins
     match /volumen\+\+/, method: :increase_volume, :use_prefix => false
     match /volume--/, method: :decrease_volume, :use_prefix => false
     match /^ponme argo\s*(.*)/, method: :play_known_random, :use_prefix => false
+    match /^vamos connecta$/, method: :connect, :use_prefix => false
 
     def initialize(*args)
       super
@@ -36,11 +37,17 @@ module Plugins
 
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
       @db_song = config[:database]
-      config[:mpd_port] ||= 6600
-      config[:mpd_url] ||= 'localhost'
-      @mpd = MPD.new "#{config[:mpd_url]}", "#{config[:mpd_port]}"
+      port = config[:mpd_port] || 6600
+      uri = config[:mpd_url] || 'localhost'
+      @mpd = MPD.new uri, port
+      while not @mpd.connected?
+        sleep 1
+        @mpd.connect
+      end
+      @mpd.clear
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       @mpd.add flv
+      @mpd.play unless @mpd.playing?
     end
 
     listen_to :join
@@ -93,11 +100,14 @@ module Plugins
 
     def wine(m)
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=-nQgsEbU9C4')
+      @mpd.clear 
       @mpd.add flv
+      @mpd.play unless @mpd.playing?
       m.reply "Viva el vino!!!"
     end
 
     def play_known(m, query)
+      @mpd.clear unless @mpd.playing?
       db = File.readlines(@db_song)
       found = false
       db.each do |line|
@@ -105,6 +115,7 @@ module Plugins
           play = line.split(/ /)[0]
           flv = YoutubeDL::Downloader.url_flv(play)
           @mpd.add(flv)
+          @mpd.play unless @mpd.playing?
           title =YoutubeDL::Downloader.video_title(play) 
           m.reply "Tomalo, chato: #{title}"
           found = true
@@ -124,17 +135,13 @@ module Plugins
     end
 
     def trame(m, query)
-      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
-      if video.nil?
-        m.reply "no veo el #{query}"
-      else
-        flv = YoutubeDL::Downloader.url_flv(video.player_url)
-        @mpd.add(flv)
-        m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
-      end
+      @mpd.stop
+      @mpd.clear
+      execute_aluego(m, query)
     end
 
     def execute_aluego(m, query)
+      @mpd.clear unless @mpd.playing?
       length = "UNKNOWN LENGTH"
       if /http:\/\//.match(query)
         uri = query
@@ -147,6 +154,7 @@ module Plugins
       else
         flv = YoutubeDL::Downloader.url_flv(uri)
         @mpd.add flv
+        @mpd.play unless @mpd.playing?
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
         m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
       end
@@ -178,7 +186,11 @@ module Plugins
       end
       title =YoutubeDL::Downloader.video_title(play) 
       m.reply "Tomalo, chato: #{title}"
-      @mpd.play true
+      @mpd.play
+    end
+
+    def connect(m)
+      @mpd.connect unless @mpd.connected?
     end
 
 

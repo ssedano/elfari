@@ -159,15 +159,8 @@ module Plugins
     end
 
     def trame(m, query)
-      video = @youtube.videos_by(:query => query, :max_results => 1).videos.at(0)
-      if video.nil?
-        m.reply "no veo el #{query}"
-      else
-        @vlc.clear_playlist
-        @vlc.stream=video.player_url 
-        m.reply "Toma " + YoutubeDL::Downloader.video_title(video.player_url) + " directo de #{video.player_url} (#{Time.at(video.duration).utc.strftime("%T")})"
-        @vlc.playing=true
-      end
+      @vlc.playing=false
+      @vlc.clear_playlist
     end
 
     def execute_aluego(m, query)

@@ -9,3 +9,8 @@ gem "vlcrc"
 gem "alchemist"
 gem "em-synchrony"
 gem "ruby-mpd"
+gem 'typhoeus'
+gem "goospell"
+gem "twitter"
+gem "tweetstream"
+gem "nokogiri"

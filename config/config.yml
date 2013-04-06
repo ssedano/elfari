@@ -3,8 +3,8 @@
 
 :abiquo:
   :host: mothership
-  :user: admin
-  :password: xabiquo
+  :user: elfari
+  :password: ""
 
 :gitdude:
   :repos:
@@ -13,33 +13,31 @@
         
 :nick: elfari
 :channels:
-  - "#foobarslkj chan-key"
+  - "#foobarslkj"
 :timeout: 10000
 
 :elfari:
   :url: 'localhost'
   :port: 4567
-
-
-:mplayer: '/opt/local/bin/mplayer' 
-
+:mplayer: '/usr/bin/mplayer' 
 
 :database: 'config/db/database'
-
 :melee:
   :channel: "#foobarslkj chan-key"
 
 :internet_song: 'config/tracks/internet_down.ogg'
 
 :vlc:
-  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
-  :host: 'localhost'
+  :bin: '/usr/bin/vlc'
+  :host: '0.0.0.0'
   :port: 4000
   :args: '--ignore-config -I lua --lua-intf cli --no-video' 
+  :channel: "#foobarslkj"
 
-:mpd_url: 'localhost'
+:mpd_url: '127.0.0.1'
 :mpd_port: 6600
 
 :twitter:
-  :screen_name: 'telorimo'
+  :lang: 'es'
+  :screen_names: 'screen_name1, term2' # Comma separated
   :channel: '#foobarslkj'

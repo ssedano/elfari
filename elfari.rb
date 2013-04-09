@@ -49,7 +49,8 @@ bot = Cinch::Bot.new do
       #Plugins::MPD, 
       #Plugins::VLC,
       #Plugins::Player,
-      Plugins::Tuiter] 
+      Plugins::Tuiter,
+      Plugins::Say] 
 
     c.plugins.options= { 
       #Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },

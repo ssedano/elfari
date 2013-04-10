@@ -13,8 +13,8 @@ module Plugins
       elsif RUBY_PLATFORM =~ /^win/
         raise Cinch::Exceptions::UnsupportedFeature.new "This plugin is only compatible with linux or mac"
       else
-        @cmd_en = "say -v Vicki "
-        @cmd_es = "say -v Monica "
+        @cmd_en = "say -v Vicki '"
+        @cmd_es = "say -v Monica '"
       end
     end 
     
@@ -22,12 +22,12 @@ module Plugins
     match /say\s*(.*)/, method: :english, :use_prefix => false
 
     def say(m, text)
-      cmd = "#{@cmd_es}#{text}"
+      cmd = "#{@cmd_es}#{text}'"
       %x[ #{cmd} ] 
     end
 
     def english(m, text)
-      cmd = "#{@cmd_en}#{text}"
+      cmd = "#{@cmd_en}#{text}'"
       %x[ #{cmd} ]
     end
   end

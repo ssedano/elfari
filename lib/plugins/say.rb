@@ -17,7 +17,7 @@ module Plugins
         @cmd_es = "say -v Monica '"
       end
     end 
-    
+    match "jenny cuenta un chiste", method: :joke, :use_prefix => false
     match /dimelo\s*(.*)/, method: :say, :use_prefix => false
     match /say\s*(.*)/, method: :english, :use_prefix => false
 
@@ -29,6 +29,21 @@ module Plugins
     def english(m, text)
       cmd = "#{@cmd_en}#{text}'"
       %x[ #{cmd} ]
+    end
+
+    def joke(m)
+      joke = ''
+      i = 4
+      while joke.empty? and i > 0
+        response = Nokogiri::HTML(RestClient.get URI.encode("http://www.chistescortos.eu/random"))
+        response.css('a[class=oldlink]').each do |j|
+          joke = j.text if j.text.length < 240
+        end
+        i = i - 1
+      end
+      return if joke.empty? and i == 0
+      cmd = "#{@cmd_es}#{joke}'"
+      %x[ #{cmd} ] 
     end
   end
 end

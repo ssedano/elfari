@@ -11,7 +11,7 @@ require File.dirname(__FILE__) + '/../util/elfari_util'
 
 module Plugins
 
-  class MPD
+  class Mpd
     include Cinch::Plugin
 
     match /shh/, method: :pause, :use_prefix => false
@@ -44,10 +44,11 @@ module Plugins
         sleep 1
         @mpd.connect
       end
-      @mpd.clear
+      @mpd.clear unless @mpd.playing?
       flv = YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       @mpd.add flv
       @mpd.play unless @mpd.playing?
+      @s = false
     end
 
     listen_to :join
@@ -57,7 +58,8 @@ module Plugins
     end
 
     def pause(m)
-      @mpd.pause
+      @mpd.pause=(@s)
+      @s = !@s
       m.reply "pausa"
     end
 
@@ -107,16 +109,15 @@ module Plugins
     end
 
     def play_known(m, query)
-      @mpd.clear unless @mpd.playing?
       db = File.readlines(@db_song)
       found = false
       db.each do |line|
         if line =~ /#{query}/i
           play = line.split(/ /)[0]
           flv = YoutubeDL::Downloader.url_flv(play)
+          title =YoutubeDL::Downloader.video_title(play) 
           @mpd.add(flv)
           @mpd.play unless @mpd.playing?
-          title =YoutubeDL::Downloader.video_title(play) 
           m.reply "Tomalo, chato: #{title}"
           found = true
           break
@@ -141,7 +142,6 @@ module Plugins
     end
 
     def execute_aluego(m, query)
-      @mpd.clear unless @mpd.playing?
       length = "UNKNOWN LENGTH"
       if /http:\/\//.match(query)
         uri = query
@@ -153,16 +153,19 @@ module Plugins
         m.reply "no veo el #{query}"
       else
         flv = YoutubeDL::Downloader.url_flv(uri)
-        @mpd.add flv
-        @mpd.play unless @mpd.playing?
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
         m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
+        @mpd.add flv
+        @mpd.play unless @mpd.playing?
+
       end
     end
 
     def melee(m)
       play_known(m, 'franzl yodlling')
     end
+
+
 
     def get_volume(m)
       volume = @mpd.volume
@@ -178,13 +181,8 @@ module Plugins
       song = db.at(Random.rand(db.length)) 
       play = song.split(/ /)[0]
       flv = YoutubeDL::Downloader.url_flv(play)
-      if @mpd.playing?
-        @mpd.add flv
-      else
-        @mpd.clear
-        @mpd.add flv
-      end
       title =YoutubeDL::Downloader.video_title(play) 
+      @mpd.add flv
       m.reply "Tomalo, chato: #{title}"
       @mpd.play
     end

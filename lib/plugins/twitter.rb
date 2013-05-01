@@ -117,12 +117,17 @@ module Plugins
             :oauth_token_secret => ENV['GENARDO_TWITTER_OAUTH_TOKEN_SECRET'],
             :middleware => Faraday::Builder.new(&middleware)})
 
+	  q = query.strip
+          if query.start_with? '@'
+            q = "from:#{q.split(' ')[0]}#{q.split(' ').drop(1).join}"
+          end
+
           fix = {}
 
           retries = 4
           while fix.empty? and retries > 0
             retries = retries - 1
-            tweets = genardo.search("#{query.strip} -rt", {:count => 1, :lang => 'es', :result_type => "recent"}).results
+            tweets = genardo.search("#{q} -rt", {:count => 1, :lang => 'es', :result_type => "recent"}).results
             if tweets.empty?
               m.reply "#{query.strip} no lo veo"
               return

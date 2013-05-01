@@ -46,7 +46,7 @@ bot = Cinch::Bot.new do
     c.channels = config[:channels]
     c.nick = config[:nick]
     c.plugins.plugins = [
-      #Plugins::MPD, 
+      Plugins::Mpd, 
       #Plugins::VLC,
       #Plugins::Player,
       Plugins::Tuiter,
@@ -60,7 +60,7 @@ bot = Cinch::Bot.new do
                         #:host => config[:vlc][:host],
                         #:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
                         #:internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
-	#Plugins::MPD => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"}
+	Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
          Plugins::Tuiter => {:lang => config[:twitter][:lang]}
     }
     c.timeouts.connect = config[:timeout]
@@ -74,10 +74,10 @@ EM.defer {
 }
 
 TweetStream.configure do |c|
-  c.consumer_key = ENV['TWITTER_CONSUMER_KEY']
-  c.consumer_secret = ENV['TWITTER_CONSUMER_SECRET']
-  c.oauth_token = ENV['TWITTER_OAUTH_TOKEN']
-  c.oauth_token_secret = ENV['TWITTER_OAUTH_TOKEN_SECRET']
+  c.consumer_key = ENV['GENARDO_TWITTER_CONSUMER_KEY']
+  c.consumer_secret = ENV['GENARDO_TWITTER_CONSUMER_SECRET']
+  c.oauth_token = ENV['GENARDO_TWITTER_OAUTH_TOKEN']
+  c.oauth_token_secret = ENV['GENARDO_TWITTER_OAUTH_TOKEN_SECRET']
   c.auth_method = :oauth
 end
 

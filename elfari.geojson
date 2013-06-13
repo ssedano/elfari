@@ -12,6 +12,6 @@
         "underConstruction": "false",
         "marker-size": "large",
         "marker-color": "orange",
-        "marker-symbol": "marker-stroke"    
+        "marker-symbol": "marker"   
     }
 }

@@ -9,9 +9,9 @@
     "properties": {
         "name": "elfari home",
         "popupContent": "Here I sit, playing music and tweeting the day away!",
-        "underConstruction": "false",
+        "title": "elfari",
         "marker-size": "large",
-        "marker-color": "orange",
-        "marker-symbol": "marker"   
+        "marker-color": "#EE7600",
+        "marker-symbol": "bus"
     }
 }

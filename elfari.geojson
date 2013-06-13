@@ -11,10 +11,10 @@
                     ]
             },
             "properties": {
-                "elfari home": "Here I sit, playing music and tweeting the day away!",
+                "elfari": "Here I sit, playing music and tweeting the day away!",
                 "marker-size": "medium",
                 "marker-color": "#EE7600",
-                "marker-symbol": "marker"
+                "marker-symbol": "harbor"
             }
         }
     ]

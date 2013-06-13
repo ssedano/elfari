@@ -10,8 +10,8 @@
         "name": "elfari home",
         "popupContent": "Here I sit, playing music and tweeting the day away!",
         "title": "elfari",
-        "marker-size": "large",
+        "marker-size": "medium",
         "marker-color": "#EE7600",
-        "marker-symbol": "bus"
+        "marker-symbol": "marker"
     }
 }

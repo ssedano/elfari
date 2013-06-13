@@ -7,9 +7,8 @@
          ]
     },
     "properties": {
-        "name": "elfari home",
-        "popupContent": "Here I sit, playing music and tweeting the day away!",
-        "title": "elfari",
+        "": "elfari home",
+        "": "Here I sit, playing music and tweeting the day away!",
         "marker-size": "medium",
         "marker-color": "#EE7600",
         "marker-symbol": "marker"

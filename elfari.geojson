@@ -12,7 +12,7 @@
             },
             "properties": {
                 "elfari": "Here I sit, playing music and tweeting the day away!",
-                "marker-size": "medium",
+                "marker-size": "large",
                 "marker-color": "#EE7600",
                 "marker-symbol": "harbor"
             }

@@ -19,8 +19,8 @@ module Plugins
     match /genardo alecciona(.*)/, method: :lecture, :use_prefix => false
     match /genardo trendings(.*)/, method: :trends, :use_prefix => false
     match /genardo chiste(.*)/, method: :joke, :use_prefix => false
+    match /genardo status(.*)/, method: :status, :use_prefix => false
 
-    
     def initialize(*args)
       super
       @lang = config[:lang] || 'es' 
@@ -117,7 +117,7 @@ module Plugins
             :oauth_token_secret => ENV['GENARDO_TWITTER_OAUTH_TOKEN_SECRET'],
             :middleware => Faraday::Builder.new(&middleware)})
 
-	  q = query.strip
+          q = query.strip
           if query.start_with? '@'
             q = "from:#{q.split(' ')[0]}#{q.split(' ').drop(1).join}"
           end
@@ -227,6 +227,57 @@ module Plugins
           m.reply "#{joke} #chiste"
           genardo.update("#{joke} #chiste #deNada")
           m.reply "dicho!"
+        rescue Twitter::Error => fail
+          m.reply "No pueeeeedo: #{fail}"
+        rescue Exception => fail
+          m.reply "No pueeeedo: #{fail}"
+        end
+      }
+    end
+    def status(m, query)
+      Thread.new {
+        begin
+          middleware = Proc.new do |builder|
+            builder.use Twitter::Request::MultipartWithFile
+            builder.use Faraday::Request::Multipart
+            builder.use Faraday::Request::UrlEncoded
+            builder.use Twitter::Response::RaiseError, Twitter::Error::ClientError
+            builder.use Twitter::Response::ParseJson
+            builder.use Twitter::Response::RaiseError, Twitter::Error::ServerError
+            builder.adapter :typhoeus
+          end
+          genardo = Twitter::Client.new({
+            :consumer_key => ENV['GENARDO_TWITTER_CONSUMER_KEY'],
+            :consumer_secret => ENV['GENARDO_TWITTER_CONSUMER_SECRET'],
+            :oauth_token => ENV['GENARDO_TWITTER_OAUTH_TOKEN'],
+            :oauth_token_secret => ENV['GENARDO_TWITTER_OAUTH_TOKEN_SECRET'],
+            :middleware => Faraday::Builder.new(&middleware)})
+
+          joke = ''
+          category = ["http://gifsoup.com/gallery/cute-gifs-43",
+                      "http://gifsoup.com/gallery/funny-gifs-45",
+                      "http://gifsoup.com/gallery/cool-gifs-53",
+                      "http://gifsoup.com/gallery/people-gifs-48",
+                      "http://gifsoup.com/gallery/extreme-gifs-44",
+                      "http://gifsoup.com/gallery/everything-else-gifs-47",
+                      "http://gifsoup.com/gallery/pets-and-animals-gifs-55",
+                      "http://gifsoup.com/gallery/television-gifs-40",
+                      "http://gifsoup.com/gallery/music-gifs-39",
+                      "http://gifsoup.com/gallery/movies-gifs-38",
+                      "http://gifsoup.com/gallery/video-games-gifs-41",
+                      "http://gifsoup.com/gallery/cartoons-anime-gifs-37",
+                      "http://gifsoup.com/gallery/football-gifs-32",
+                      "http://gifsoup.com/gallery/basketball-gifs-31",
+                      "http://gifsoup.com/gallery/baseball-gifs-30",
+                      "http://gifsoup.com/gallery/mixed-martial-arts-gifs-33",
+                      "http://gifsoup.com/gallery/other-gifs-35",
+                      "http://gifsoup.com/gallery/soccer-gifs-34"].sample
+                      response = Nokogiri::HTML(RestClient.get URI.encode("#{category}/page#{1 + rand(20)}"))
+                      gif = response.css('a[class="image f"]').to_ary[1 + rand(20)].css("img").attr("src").text
+                      return if gif.empty?
+                      m.reply "current status #{gif} #gif"
+                      genardo.update("current status #{joke} #gif")
+                      m.reply "dicho!"
         rescue Twitter::Error => fail
           m.reply "No pueeeeedo: #{fail}"
         rescue Exception => fail

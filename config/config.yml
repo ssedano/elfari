@@ -1,16 +1,6 @@
 ---
 :server: irc.freenode.net
 
-:abiquo:
-  :host: mothership
-  :user: elfari
-  :password: ""
-
-:gitdude:
-  :repos:
-    - :name: Abiquo
-      :path: '~/repos/platform'
-        
 :nick: elfari
 :channels:
   - "#foobarslkj"
@@ -39,5 +29,5 @@
 
 :twitter:
   :lang: 'es'
-  :screen_names: 'screen_name1, term2' # Comma separated
+  :screen_names: 'screen_name1,term2' # Comma separated
   :channel: '#foobarslkj'

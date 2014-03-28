@@ -1,9 +1,9 @@
 require 'cinch'
 require 'twitter'
-require 'goospell'
 require 'typhoeus/adapters/faraday'
 require 'rest_client'
 require 'nokogiri'
+require 'after_the_deadline'
 require 'uri'
 
 module Plugins
@@ -23,7 +23,8 @@ module Plugins
 
     def initialize(*args)
       super
-      @lang = config[:lang] || 'es' 
+      @lang = config[:lang] || 'es'
+      AfterTheDeadline('es', nil, 'elfari')
     end
 
     def tweet_genardo(m, query)
@@ -136,16 +137,16 @@ module Plugins
             next if t.text.length > 100 or t.text.include? '@'
             text = t.text
 
-            tt = text.split.reject { |n| n.start_with? '#' or n.start_with? '@' }
-            fix = Goospell::spell(tt.join(' '), 'es')
+            tt = text.split.reject { |n| n.start_with? '#' or n.start_with? '@' or n.start_with? 'http'}
+            fix = AfterTheDeadline.check(tt.join(' '))
           end
 
           if fix.empty?
             return
           end
           m.reply "@#{t.user.screen_name} menudo cateto: #{text}"
-          fix.each do |w, f|
-            text.sub!(w, f[0]) unless f.empty?
+          fix.each do |w|
+            text.sub!(w.string, w.suggestions[0]) unless w.suggestions.empty? 
           end
           re = "Se escribe: #{text}. #deNada @#{t.user.screen_name}, no @rimamelo?"
           m.reply "Voy a tweetear #{re}"
@@ -253,7 +254,6 @@ module Plugins
             :oauth_token_secret => ENV['GENARDO_TWITTER_OAUTH_TOKEN_SECRET'],
             :middleware => Faraday::Builder.new(&middleware)})
 
-          joke = ''
           category = ["http://gifsoup.com/gallery/cute-gifs-43",
                       "http://gifsoup.com/gallery/funny-gifs-45",
                       "http://gifsoup.com/gallery/cool-gifs-53",
@@ -265,18 +265,12 @@ module Plugins
                       "http://gifsoup.com/gallery/music-gifs-39",
                       "http://gifsoup.com/gallery/movies-gifs-38",
                       "http://gifsoup.com/gallery/video-games-gifs-41",
-                      "http://gifsoup.com/gallery/cartoons-anime-gifs-37",
-                      "http://gifsoup.com/gallery/football-gifs-32",
-                      "http://gifsoup.com/gallery/basketball-gifs-31",
-                      "http://gifsoup.com/gallery/baseball-gifs-30",
-                      "http://gifsoup.com/gallery/mixed-martial-arts-gifs-33",
-                      "http://gifsoup.com/gallery/other-gifs-35",
-                      "http://gifsoup.com/gallery/soccer-gifs-34"].sample
+                      "http://gifsoup.com/gallery/cartoons-anime-gifs-37"].sample
                       response = Nokogiri::HTML(RestClient.get URI.encode("#{category}/page#{1 + rand(20)}"))
-                      gif = response.css('a[class="image f"]').to_ary[1 + rand(20)].css("img").attr("src").text
-                      return if gif.empty?
-                      m.reply "current status #{gif} #gif"
-                      genardo.update("current status #{joke} #gif")
+                      gif = response.css('a[class="image f"]').to_ary[1 + rand(20)].css("img").attr("onmouseover").text.scan /(http.*)-a.gif';/
+		      gif = gif[0][0]
+                      m.reply "current status #{gif}-o.gif #gif"
+                      genardo.update("current status #{gif}-o.gif #gif")
                       m.reply "dicho!"
         rescue Twitter::Error => fail
           m.reply "No pueeeeedo: #{fail}"

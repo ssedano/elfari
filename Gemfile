@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "cinch"
+gem "cinch", '2.0.4'
 gem "rest-client"
 gem "ruby-youtube-dl"
 gem "mplayer-ruby"
@@ -10,7 +10,7 @@ gem "alchemist"
 gem "em-synchrony"
 gem "ruby-mpd"
 gem 'typhoeus'
-gem "goospell"
+gem "after_the_deadline"
 gem "twitter"
 gem "tweetstream"
 gem "nokogiri"

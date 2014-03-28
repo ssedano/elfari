@@ -19,6 +19,14 @@ cd elfari && bundle
 
 Tune `config/config.yml` file and run either the `run.sh` or `elfari.rb`.
 
+## Configuration
+
+Recommended line to launch `VLC`:
+
+```
+vlc -vvv --ignore-config -I lua --lua-intf cli --no-video --lua-config "rc={host='0.0.0.0:4000',flatplaylist=0}"
+```
+
 ## Note on players
 
 There are three supported players:
@@ -48,6 +56,16 @@ The most rewarding ones are:
 
 * genardo alecciona
 - This command accepts parameters. Search for a tweet with the parameters (if no parameters, just any tweet), sends its words to Google Spell Checker API, substitute all coincidences with the first correction, then sends the corrected tweet to its original author. Note that here I use the term "corrected" very lightly, most of the times it just fails miserably correcting it.
+
+## Troubleshooting
+
+Every now and then `youtube downloader` need to be updated. Do so by issuing this command (\*NIX):
+
+```
+sudo youtube-dl -U
+```
+
+`VLC` can also be launched in a console and `ElFari` will connect to it instead of starting an instance. This is useful to see the output of `VLC`.
 
 ## License
 

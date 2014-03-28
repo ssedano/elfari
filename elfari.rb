@@ -14,7 +14,9 @@ require 'alchemist'
 require 'uri'
 require 'em-synchrony'
 require 'plugins/say'
-require 'plugins/mpd'
+#require 'plugins/mpd'
+require 'plugins/vlc'
+#require 'plugins/player'
 require 'plugins/twitter'
 require 'tweetstream'
 require 'typhoeus/adapters/faraday'
@@ -46,21 +48,21 @@ bot = Cinch::Bot.new do
     c.channels = config[:channels]
     c.nick = config[:nick]
     c.plugins.plugins = [
-      Plugins::Mpd, 
-      #Plugins::VLC,
-      #Plugins::Player,
+      #Plugins::Mpd, 
+     Plugins::VLC,
+#      Plugins::Player,
       Plugins::Tuiter,
       Plugins::Say] 
 
     c.plugins.options= { 
-      #Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
-      #Plugins::VLC => { :bin => config[:vlc][:bin],
-                        #:port => config[:vlc][:port],
-                        #:args => config[:vlc][:args],
-                        #:host => config[:vlc][:host],
-                        #:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
-                        #:internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
-	Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
+#      Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
+      Plugins::VLC => { :bin => config[:vlc][:bin],
+                        :port => config[:vlc][:port],
+                        :args => config[:vlc][:args],
+                        :host => config[:vlc][:host],
+                        :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
+                        :internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
+	#Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
          Plugins::Tuiter => {:lang => config[:twitter][:lang]}
     }
     c.timeouts.connect = config[:timeout]
@@ -72,7 +74,6 @@ end
 EM.defer {
   bot.start
 }
-
 TweetStream.configure do |c|
   c.consumer_key = ENV['GENARDO_TWITTER_CONSUMER_KEY']
   c.consumer_secret = ENV['GENARDO_TWITTER_CONSUMER_SECRET']
@@ -89,7 +90,6 @@ until @channel do
   end
   sleep 1 
 end 
-
 
 screen_names = config[:twitter][:screen_names] || ""
 TweetStream::Client.new.on_error do |error|

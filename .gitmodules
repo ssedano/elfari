@@ -1,0 +1,6 @@
+[submodule "deps/mplayer-ruby"]
+	path = deps/mplayer-ruby
+	url = git@github.com:ssedano/mplayer-ruby.git
+[submodule "deps/vlcrc"]
+	path = deps/vlcrc
+	url = git@github.com:ssedano/vlcrc.git

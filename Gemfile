@@ -1,16 +1,14 @@
-source "http://rubygems.org"
+source 'http://rubygems.org'
 
-gem "cinch", '2.0.4'
-gem "rest-client"
-gem "ruby-youtube-dl"
-gem "mplayer-ruby"
-gem "youtube_it"
-gem "vlcrc"
-gem "alchemist"
-gem "em-synchrony"
-gem "ruby-mpd"
-gem 'typhoeus'
-gem "after_the_deadline"
-gem "twitter"
-gem "tweetstream"
-gem "nokogiri"
+gem 'cinch', '2.0.4'
+gem 'rest-client', '1.6.7'
+gem 'nokogiri', '1.6.1'
+gem 'ruby-youtube-dl', '0.0.5'
+gem 'youtube_it', '2.1.13'
+gem 'alchemist', '0.1.5'
+gem 'em-synchrony', '1.0.3'
+gem 'ruby-mpd', '0.2.1'
+gem 'typhoeus', '0.6.2'
+gem 'after_the_deadline', '0.1.3'
+gem 'twitter', '4.6.2'
+gem 'tweetstream', '2.5.0'

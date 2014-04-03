@@ -5,16 +5,26 @@ Just what the world needs, an IRC bot. A quite clumsy one.
 
 ## What does?
 
-Very little indeed. Mostly annoy people by playing music from youtube in the office. Sometimes also annoy people on Twitter.
+Very little indeed. Mostly annoy people by playing music from youtube and shouting out loud crappy jokes (Spanish) in the office. Sometimes also annoy people on Twitter.
 
 ## Installation
 
-You definitely shouldn't install this software. This is just a pet project to provide some kind of "jukebox" to the office.
+(VLC)[http://www.videolan.org] is the preferred player.
+
+Look for installers in releases page. Then use those if you prefer an easy way to install this software. Bear in mind this disclaimer:
+
+`This is just a pet project to provide some kind of "jukebox" to the office.`
+
+Installers leave the app in `/opt/elfari`. If you choose `VLC` all you have to do is `sudo /opt/elfari/bin/elfari`. It currently needs `sudo privileges`.
+
+It comes with sensible defaults for a `VLC` player integration and `*nix`.
 
 ```
 git clone git@github.com:ssedano/elfari
 
-cd elfari && bundle
+cd elfari && bundle install
+
+ruby elfari.rb
 ```
 
 Tune `config/config.yml` file and run either the `run.sh` or `elfari.rb`.

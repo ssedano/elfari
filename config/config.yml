@@ -4,12 +4,12 @@
 :nick: elfari
 :channels:
   - "#foobarslkj"
-:timeout: 10000
+:timeout: 10
 
 :elfari:
   :url: 'localhost'
   :port: 4567
-:mplayer: '/usr/bin/mplayer' 
+:mplayer: '/usr/bin/mplayer'
 
 :database: 'config/db/database'
 :melee:
@@ -18,11 +18,10 @@
 :internet_song: 'config/tracks/internet_down.ogg'
 
 :vlc:
-  :bin: '/usr/bin/vlc'
+  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
   :host: '0.0.0.0'
   :port: 4000
-  :args: '--ignore-config -I lua --lua-intf cli --no-video' 
-  :channel: "#foobarslkj"
+  :args: '--ignore-config -I lua --lua-intf cli --no-video'
 
 :mpd_url: '127.0.0.1'
 :mpd_port: 6600

@@ -7,6 +7,7 @@
 
 $: << File.dirname(__FILE__) + '/lib'
 require 'rubygems'
+require 'bundler/setup'
 require 'cinch'
 require 'yaml'
 require 'rest-client'
@@ -48,13 +49,12 @@ bot = Cinch::Bot.new do
     c.channels = config[:channels]
     c.nick = config[:nick]
     c.plugins.plugins = [
-      #Plugins::Mpd, 
+      #Plugins::Mpd,Plugins::Player
      Plugins::VLC,
-#      Plugins::Player,
       Plugins::Tuiter,
-      Plugins::Say] 
+      Plugins::Say]
 
-    c.plugins.options= { 
+    c.plugins.options= {
 #      Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
       Plugins::VLC => { :bin => config[:vlc][:bin],
                         :port => config[:vlc][:port],
@@ -70,10 +70,10 @@ bot = Cinch::Bot.new do
   end
 end
 
-
 EM.defer {
   bot.start
 }
+
 TweetStream.configure do |c|
   c.consumer_key = ENV['GENARDO_TWITTER_CONSUMER_KEY']
   c.consumer_secret = ENV['GENARDO_TWITTER_CONSUMER_SECRET']
@@ -83,13 +83,13 @@ TweetStream.configure do |c|
 end
 
 until @channel do
-  bot.channels.each do |c| 
-    if c.name == config[:twitter][:channel] 
+  bot.channels.each do |c|
+    if c.name == config[:twitter][:channel]
       @channel = c
-    end 
+    end
   end
-  sleep 1 
-end 
+  sleep 1
+end
 
 screen_names = config[:twitter][:screen_names] || ""
 TweetStream::Client.new.on_error do |error|

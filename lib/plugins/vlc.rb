@@ -3,7 +3,6 @@ require 'yaml'
 
 require 'vlcrc'
 require 'ruby-youtube-dl'
-require 'em-synchrony'
 require 'youtube_it'
 
 require File.dirname(__FILE__) + '/../util/elfari_util'
@@ -72,7 +71,7 @@ module Plugins
 
     listen_to :disconnect, method: :inet_down
     def inet_down(m)
-      puts @internet_song 
+      puts @internet_song
       @vlc.stream= @internet_song
       @vlc.playing= true
     end
@@ -137,7 +136,7 @@ module Plugins
             @vlc.clear_playlist
             @vlc.stream=flv
           end
-          title =YoutubeDL::Downloader.video_title(play) 
+          title =YoutubeDL::Downloader.video_title(play)
           m.reply "Tomalo, chato: #{title}"
           found = true
           break
@@ -195,7 +194,7 @@ module Plugins
       vol = @vlc.volume
       if vol.nil? or vol == ""
         m.reply "Ahora no esta sonando nada!"
-      else 
+      else
         m.reply "el volume: #{vol.to_i}"
       end
     end
@@ -207,7 +206,7 @@ module Plugins
     def play_known_random(m)
       db = File.readlines(@db_song)
       return unless db
-      song = db.at(Random.rand(db.length)) 
+      song = db.at(Random.rand(db.length))
       play = song.split(/ /)[0]
       flv = YoutubeDL::Downloader.url_flv(play)
       if @vlc.playing
@@ -216,7 +215,7 @@ module Plugins
         @vlc.clear_playlist
         @vlc.stream=flv
       end
-      title =YoutubeDL::Downloader.video_title(play) 
+      title =YoutubeDL::Downloader.video_title(play)
       m.reply "Tomalo, chato: #{title}"
       @vlc.playing=true
     end

@@ -5,19 +5,41 @@ Just what the world needs, an IRC bot. A quite clumsy one.
 
 ## What does?
 
-Very little indeed. Mostly annoy people by playing music from youtube in the office. Sometimes also annoy people on Twitter.
+Very little indeed. Mostly annoy people by playing music from youtube and shouting out loud crappy jokes (Spanish) in the office. Sometimes also annoy people on Twitter.
 
 ## Installation
 
-You definitely shouldn't install this software. This is just a pet project to provide some kind of "jukebox" to the office.
+(VLC)[http://www.videolan.org] is the preferred player.
+
+Look for installers in releases page. Then use those if you prefer an easy way to install this software. Bear in mind this disclaimer:
+
+`This is just a pet project to provide some kind of "jukebox" to the office.`
+
+Installers leave the app in `/opt/elfari`. If you choose `VLC` all you have to do is `sudo /opt/elfari/bin/elfari`. It currently needs `sudo privileges`.
+
+```
+sudo /opt/elfari/bin/elfari
+```
+
+It comes with sensible defaults for a `VLC` player integration and `*nix`.
 
 ```
 git clone git@github.com:ssedano/elfari
 
-cd elfari && bundle
+cd elfari && bundle install
+
+ruby elfari.rb
 ```
 
 Tune `config/config.yml` file and run either the `run.sh` or `elfari.rb`.
+
+## Configuration
+
+Recommended line to launch `VLC`:
+
+```
+vlc -vvv --ignore-config -I lua --lua-intf cli --no-video --lua-config "rc={host='0.0.0.0:4000',flatplaylist=0}"
+```
 
 ## Note on players
 
@@ -47,7 +69,19 @@ The most rewarding ones are:
 - Tweet using the credentials the status "here comes a tweet".
 
 * genardo alecciona
-- This command accepts parameters. Search for a tweet with the parameters (if no parameters, just any tweet), sends its words to Google Spell Checker API, substitute all coincidences with the first correction, then sends the corrected tweet to its original author. Note that here I use the term "corrected" very lightly, most of the times it just fails miserably correcting it.
+- This command accepts parameters. Search for a tweet with the parameters (if no parameters, just any tweet), sends its words to [After the Deadline](http://www.afterthedeadline.com/api.slp) Spell Checker API, substitute all coincidences with the first correction, then sends the corrected tweet to its original author. Note that here I use the term "corrected" very lightly, most of the times it just fails miserably correcting it.
+
+## Troubleshooting
+
+Every now and then `youtube downloader` need to be updated. Do so by issuing this command (\*NIX):
+
+```
+sudo youtube-dl -U
+```
+
+`VLC` can also be launched in a console and `ElFari` will connect to it instead of starting an instance. This is useful to see the output of `VLC`.
+
+If this amazing piece of software feels like hanged it is obviously your fault. You forgot, most likely, to kindly indicate the path to the `VLC` binary (in the `config/config.yml` file).
 
 ## License
 

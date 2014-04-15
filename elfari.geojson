@@ -1,0 +1,22 @@
+{
+    "type": "FeatureCollection",
+        "features": [
+        { 
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    2.148685,
+                41.393455
+                    ]
+            },
+            "properties": {
+                "elfari": "Here I sit, playing music and tweeting the day away!",
+                "marker-size": "large",
+                "marker-color": "#EE7600",
+                "marker-symbol": "harbor"
+            }
+        }
+    ]
+}
+

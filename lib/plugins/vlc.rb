@@ -3,7 +3,6 @@ require 'yaml'
 
 require 'vlcrc'
 require 'ruby-youtube-dl'
-require 'em-synchrony'
 require 'youtube_it'
 
 require File.dirname(__FILE__) + '/../util/elfari_util'
@@ -30,6 +29,8 @@ module Plugins
     match /^volume--$/, method: :decrease_volume, :use_prefix => false
     match /^dale$/, method: :play, :use_prefix => false
     match /^ponme argo\s*(.*)/, method: :play_known_random, :use_prefix => false
+    match /que es esta mierda(.*)/, method: :current, :use_prefix => false
+    match /afuego\s+(.*)/, method: :fire, :use_prefix => false
 
     def initialize(*args)
       super
@@ -54,9 +55,8 @@ module Plugins
       end
 
       @vlc.clear_playlist
-
-      @vlc.add_stream  'http://www.youtube.com/watch?v=7nQ2oiVqKHw'
-      @vlc.add_stream  'http://www.youtube.com/watch?v=1CiqkIyw-mA'
+      @vlc.add_stream   YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=7nQ2oiVqKHw')
+      @vlc.add_stream   YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       @vlc.playing = true
 
     end
@@ -64,16 +64,14 @@ module Plugins
     listen_to :join
     def listen(m)
       if @vlc.playing
-        @vlc.add_stream 'http://www.youtube.com/watch?v=1CiqkIyw-mA'
+        @vlc.add_stream YoutubeDL::Downloader.url_flv('http://www.youtube.com/watch?v=1CiqkIyw-mA')
       else
-        @vlc.clear_playlist
-        @vlc.stream= 'http://www.youtube.com/watch?v=1CiqkIyw-mA'
       end
     end
 
     listen_to :disconnect, method: :inet_down
     def inet_down(m)
-      puts @internet_song 
+      puts @internet_song
       @vlc.stream= @internet_song
       @vlc.playing= true
     end
@@ -138,7 +136,7 @@ module Plugins
             @vlc.clear_playlist
             @vlc.stream=flv
           end
-          title =YoutubeDL::Downloader.video_title(play) 
+          title =YoutubeDL::Downloader.video_title(play)
           m.reply "Tomalo, chato: #{title}"
           found = true
           break
@@ -161,6 +159,7 @@ module Plugins
     def trame(m, query)
       @vlc.playing=false
       @vlc.clear_playlist
+      execute_aluego(m, query)
     end
 
     def execute_aluego(m, query)
@@ -174,15 +173,16 @@ module Plugins
       if uri.nil?
         m.reply "no veo el #{query}"
       else
+        flv = YoutubeDL::Downloader.url_flv(uri)
         if @vlc.playing
-          @vlc.add_stream uri
+          @vlc.add_stream flv
         else
           @vlc.clear_playlist
-          @vlc.stream= uri
+          @vlc.stream= flv
         end
+        @vlc.playing=true
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
         m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " #{uri} (#{length})"
-        @vlc.playing=true
       end
     end
 
@@ -194,7 +194,7 @@ module Plugins
       vol = @vlc.volume
       if vol.nil? or vol == ""
         m.reply "Ahora no esta sonando nada!"
-      else 
+      else
         m.reply "el volume: #{vol.to_i}"
       end
     end
@@ -202,10 +202,11 @@ module Plugins
     def deprecated(m)
       m.reply "esta pasado de moda, mejor encola la cancion con aluego"
     end
+
     def play_known_random(m)
       db = File.readlines(@db_song)
       return unless db
-      song = db.at(Random.rand(db.length)) 
+      song = db.at(Random.rand(db.length))
       play = song.split(/ /)[0]
       flv = YoutubeDL::Downloader.url_flv(play)
       if @vlc.playing
@@ -214,13 +215,30 @@ module Plugins
         @vlc.clear_playlist
         @vlc.stream=flv
       end
-      title =YoutubeDL::Downloader.video_title(play) 
+      title =YoutubeDL::Downloader.video_title(play)
       m.reply "Tomalo, chato: #{title}"
       @vlc.playing=true
     end
 
     def play()
       @vlc.playing=true
+    end
+
+    def current(m, query)
+      media = @vlc.media || "Nada, pon tu mierda!"
+      m.reply media
+    end
+
+    def fire(m, query)
+      m.reply "#{query.strip}"
+      q = query.strip
+      if q.match(/^http/)
+        @vlc.add_stream q
+        @vlc.playing=true
+        m.reply "Para ti #{q}"
+      else
+        m.reply "La uri debe empezar con http://. #{q}"
+      end
     end
   end
 end

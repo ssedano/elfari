@@ -116,7 +116,13 @@ module Plugins
           play = line.split(/ /)[0]
           flv = YoutubeDL::Downloader.url_flv(play)
           title =YoutubeDL::Downloader.video_title(play) 
-          @mpd.add(flv)
+          if @mpd.playing?
+            @mpd.add flv
+          else
+            @mpd.clear
+            @mpd.add flv
+          end
+
           @mpd.play unless @mpd.playing?
           m.reply "Tomalo, chato: #{title}"
           found = true
@@ -155,7 +161,12 @@ module Plugins
         flv = YoutubeDL::Downloader.url_flv(uri)
         length = Time.at(video.duration).utc.strftime("%T") unless video.nil?
         m.reply "encolado " + YoutubeDL::Downloader.video_title(uri) + " directo de #{uri} (#{length})"
-        @mpd.add flv
+        if @mpd.playing?
+          @mpd.add flv
+        else
+          @mpd.clear
+          @mpd.add flv
+        end
         @mpd.play unless @mpd.playing?
 
       end

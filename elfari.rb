@@ -7,6 +7,7 @@
 
 $: << File.dirname(__FILE__) + '/lib'
 require 'rubygems'
+require 'bundler/setup'
 require 'cinch'
 require 'yaml'
 require 'rest-client'
@@ -14,7 +15,9 @@ require 'alchemist'
 require 'uri'
 require 'em-synchrony'
 require 'plugins/say'
-require 'plugins/mpd'
+#require 'plugins/mpd'
+require 'plugins/vlc'
+#require 'plugins/player'
 require 'plugins/twitter'
 require 'tweetstream'
 require 'typhoeus/adapters/faraday'
@@ -46,28 +49,26 @@ bot = Cinch::Bot.new do
     c.channels = config[:channels]
     c.nick = config[:nick]
     c.plugins.plugins = [
-      Plugins::Mpd, 
-      #Plugins::VLC,
-      #Plugins::Player,
+      #Plugins::Mpd,Plugins::Player
+     Plugins::VLC,
       Plugins::Tuiter,
-      Plugins::Say] 
+      Plugins::Say]
 
-    c.plugins.options= { 
-      #Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
-      #Plugins::VLC => { :bin => config[:vlc][:bin],
-                        #:port => config[:vlc][:port],
-                        #:args => config[:vlc][:args],
-                        #:host => config[:vlc][:host],
-                        #:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
-                        #:internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
-	Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
+    c.plugins.options= {
+#      Plugins::Player => { :mplayer_bin => config[:mplayer], :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}" },
+      Plugins::VLC => { :bin => config[:vlc][:bin],
+                        :port => config[:vlc][:port],
+                        :args => config[:vlc][:args],
+                        :host => config[:vlc][:host],
+                        :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
+                        :internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
+	#Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
          Plugins::Tuiter => {:lang => config[:twitter][:lang]}
     }
     c.timeouts.connect = config[:timeout]
     c.verbose = true
   end
 end
-
 
 EM.defer {
   bot.start
@@ -82,14 +83,13 @@ TweetStream.configure do |c|
 end
 
 until @channel do
-  bot.channels.each do |c| 
-    if c.name == config[:twitter][:channel] 
+  bot.channels.each do |c|
+    if c.name == config[:twitter][:channel]
       @channel = c
-    end 
+    end
   end
-  sleep 1 
-end 
-
+  sleep 1
+end
 
 screen_names = config[:twitter][:screen_names] || ""
 TweetStream::Client.new.on_error do |error|

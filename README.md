@@ -17,6 +17,10 @@ Look for installers in releases page. Then use those if you prefer an easy way t
 
 Installers leave the app in `/opt/elfari`. If you choose `VLC` all you have to do is `sudo /opt/elfari/bin/elfari`. It currently needs `sudo privileges`.
 
+```
+sudo /opt/elfari/bin/elfari
+```
+
 It comes with sensible defaults for a `VLC` player integration and `*nix`.
 
 ```
@@ -65,7 +69,7 @@ The most rewarding ones are:
 - Tweet using the credentials the status "here comes a tweet".
 
 * genardo alecciona
-- This command accepts parameters. Search for a tweet with the parameters (if no parameters, just any tweet), sends its words to Google Spell Checker API, substitute all coincidences with the first correction, then sends the corrected tweet to its original author. Note that here I use the term "corrected" very lightly, most of the times it just fails miserably correcting it.
+- This command accepts parameters. Search for a tweet with the parameters (if no parameters, just any tweet), sends its words to [After the Deadline](http://www.afterthedeadline.com/api.slp) Spell Checker API, substitute all coincidences with the first correction, then sends the corrected tweet to its original author. Note that here I use the term "corrected" very lightly, most of the times it just fails miserably correcting it.
 
 ## Troubleshooting
 
@@ -76,6 +80,8 @@ sudo youtube-dl -U
 ```
 
 `VLC` can also be launched in a console and `ElFari` will connect to it instead of starting an instance. This is useful to see the output of `VLC`.
+
+If this amazing piece of software feels like hanged it is obviously your fault. You forgot, most likely, to kindly indicate the path to the `VLC` binary (in the `config/config.yml` file).
 
 ## License
 

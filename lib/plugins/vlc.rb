@@ -17,9 +17,11 @@ module Plugins
     match /volumen\s*(\d*)/, method: :volume, :use_prefix => false
     match /quita esta mierda/, method: :next_song, :use_prefix => false
     match /apunta\s*(.+)/, method: :add_song_db, :use_prefix => false
+    match /apuntaapm\s*(.+)/, method: :add_song_apm, :use_prefix => false
     match /vino/, method: :wine, :use_prefix => false
     match /que\stiene/, method: :list, :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
+    match /apm\s*(.*)/, method: :play_apm, :use_prefix => false
     match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
     match /trame\s*(.*)/, method: :trame, :use_prefix => false
     match /ponmelo.*/, method: :deprecated, :use_prefix => false
@@ -37,6 +39,7 @@ module Plugins
       @youtube = YouTubeIt::Client.new if @youtube.nil?
 
       @db_song = config[:database]
+      @db_apm = config[:apm]
 
       config[:host] ||= 'localhost'
       config[:port] ||= 1234
@@ -84,6 +87,7 @@ module Plugins
     def volume(m, query)
       @vlc.volume=query.to_i
     end
+    
     def increase_volume(m)
       vol = @vlc.volume
       if vol.nil? or vol == ""
@@ -92,6 +96,7 @@ module Plugins
       vol = vol.to_i + 10
       volume(m, vol)
     end
+    
     def decrease_volume(m)
       vol = @vlc.volume
       if vol.nil? or vol == ""
@@ -100,18 +105,27 @@ module Plugins
       vol = vol.to_i - 10
       @vlc.volume(m, vol)
     end
+    
     def next_song(m)
       @vlc.next
     end
 
     def add_song_db(m, query)
+      add_song_file(m, query, @db_song)
+    end
+
+    def add_song_apm(m, query)
+      add_song_file(m, query, @db_apm)
+    end
+    
+    def add_song_file(m, query, filename)
       if query.match(/^http/)
         title = YoutubeDL::Downloader.video_title(query)
         if title.nil?
           m.reply "No me suena"
         else
-          File.open(@db_song, 'a') { |n| n.puts "#{query} - #{title}\n"}
-          m.reply "#{title} en la base de datos"
+          File.open(filename, 'a') { |n| n.puts "#{query} - #{title}\n"}
+          m.reply "#{title} en la base de datos: #{filename}"
         end
       else
         m.reply "eso no es una uri"
@@ -124,7 +138,14 @@ module Plugins
     end
 
     def play_known(m, query)
-      db = File.readlines(@db_song)
+        play_from_file(m, query, @db_song)
+
+    def play_apm(m, query)
+        play_from_file(m, query, @db_apm)
+    end
+    
+    def play_from_file(m, query, filename)
+      db = File.readlines(filename)
       found = false
       db.each do |line|
         if line =~ /#{query}/i
@@ -146,7 +167,7 @@ module Plugins
 
       @vlc.playing=true if found
     end
-
+    
     def list(m)
       db = File.readlines(@db_song)
 

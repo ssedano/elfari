@@ -12,6 +12,7 @@
 :mplayer: '/usr/bin/mplayer'
 
 :database: 'config/db/database'
+:apm: 'config/db/apm'
 :melee:
   :channel: "#foobarslkj chan-key"
 

@@ -16,8 +16,8 @@ module Plugins
     match /shh/, method: :pause, :use_prefix => false
     match /volumen\s*(\d*)/, method: :volume, :use_prefix => false
     match /quita esta mierda/, method: :next_song, :use_prefix => false
-    match /apunta\s*(.+)/, method: :add_song_db, :use_prefix => false
-    match /apuntaapm\s*(.+)/, method: :add_song_apm, :use_prefix => false
+    match /apunta\s+(.+)/, method: :add_song_db, :use_prefix => false
+    match /apuntaapm\s+(.+)/, method: :add_song_apm, :use_prefix => false
     match /vino/, method: :wine, :use_prefix => false
     match /que\stiene/, method: :list, :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false

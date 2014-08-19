@@ -142,7 +142,9 @@ module Plugins
     end
 
     def play_apm(m, query)
-        play_from_file(m, query, @db_apm)
+      @vlc.playing=false
+      @vlc.clear_playlist
+      play_from_file(m, query, @db_apm)
     end
     
     def play_from_file(m, query, filename)

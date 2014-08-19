@@ -21,7 +21,7 @@ module Plugins
     match /vino/, method: :wine, :use_prefix => false
     match /que\stiene/, method: :list, :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
-    match /apm\s*(.*)/, method: :play_apm, :use_prefix => false
+    match /^apm\s*(.*)/, method: :play_apm, :use_prefix => false
     match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
     match /trame\s*(.*)/, method: :trame, :use_prefix => false
     match /ponmelo.*/, method: :deprecated, :use_prefix => false

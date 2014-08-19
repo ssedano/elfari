@@ -138,21 +138,23 @@ module Plugins
     end
 
     def play_known(m, query)
-        play_from_file(m, query, @db_song, false)
+        play_from_file(m, query, @db_song)
     end
 
     def play_apm(m, query)
-      play_from_file(m, query, @db_apm, true)
+      @vlc.playing=false
+      @vlc.clear_playlist
+      play_from_file(m, query, @db_apm)
     end
     
-    def play_from_file(m, query, filename, clear_playlist)
+    def play_from_file(m, query, filename)
       db = File.readlines(filename)
       found = false
       db.each do |line|
         if line =~ /#{query}/i
           play = line.split(/ /)[0]
           flv = YoutubeDL::Downloader.url_flv(play)
-          if @vlc.playing and !clear_playlist
+          if @vlc.playing
             @vlc.add_stream flv
           else
             @vlc.clear_playlist

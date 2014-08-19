@@ -139,6 +139,7 @@ module Plugins
 
     def play_known(m, query)
         play_from_file(m, query, @db_song)
+    end
 
     def play_apm(m, query)
         play_from_file(m, query, @db_apm)

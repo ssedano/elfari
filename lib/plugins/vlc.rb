@@ -20,7 +20,7 @@ module Plugins
     match /apuntaapm\s+(.+)/, method: :add_song_apm, :use_prefix => false
     match /vino/, method: :wine, :use_prefix => false
     match /que\stiene/, method: :list, :use_prefix => false
-    match /^list\s?apm/, method: :list_apm :use_prefix => false
+    match /^list\s?apm/, method: :list_apm, :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
     match /^apm\s*(.*)/, method: :play_apm, :use_prefix => false
     match /aluego(.*)/, method: :execute_aluego, :use_prefix => false

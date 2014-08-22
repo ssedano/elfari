@@ -126,7 +126,7 @@ module Plugins
           m.reply "No me suena"
         else
           File.open(filename, 'a') { |n| n.puts "#{query} - #{title}\n"}
-          m.reply "#{title} en la base de datos: #{filename}"
+          m.reply "Apuntado #{title} en la base de datos"
         end
       else
         m.reply "eso no es una uri"

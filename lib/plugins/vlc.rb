@@ -20,6 +20,7 @@ module Plugins
     match /apuntaapm\s+(.+)/, method: :add_song_apm, :use_prefix => false
     match /vino/, method: :wine, :use_prefix => false
     match /que\stiene/, method: :list, :use_prefix => false
+    match /^list\s?apm/, method: :list_apm :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
     match /^apm\s*(.*)/, method: :play_apm, :use_prefix => false
     match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
@@ -170,10 +171,17 @@ module Plugins
 
       @vlc.playing=true if found
     end
-    
-    def list(m)
-      db = File.readlines(@db_song)
 
+    def list(m)
+      list_file(m, @db_song)
+    end
+
+    def list_apm(m)
+      list_file(m, @db_apm)
+    end
+
+    def list_file(m, filename)
+      db = File.readlines(filename)
       m.reply "Tengo esto piltrafa:\n"
       db.each do |line|
         m.reply line

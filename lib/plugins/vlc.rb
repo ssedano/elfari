@@ -41,6 +41,7 @@ module Plugins
 
       @db_song = config[:database]
       @db_apm = config[:apm]
+      @apm_folder = config[:apm_folder]
 
       config[:host] ||= 'localhost'
       config[:port] ||= 1234
@@ -116,9 +117,14 @@ module Plugins
     end
 
     def add_song_apm(m, query)
-      add_song_file(m, query, @db_apm)
+      if query.match(/^http/)
+       `youtube-dl -o '#{@apm_folder}/%(title)s-%(format_id)s-%(id)s.%(ext)s' --no-progress   #{query}`.strip
+       m.reply "Ya es nuestro!"
+      else
+        m.reply "eso no es una uri"
+      end
     end
-    
+
     def add_song_file(m, query, filename)
       if query.match(/^http/)
         title = YoutubeDL::Downloader.video_title(query)
@@ -143,7 +149,14 @@ module Plugins
     end
 
     def play_apm(m, query)
-      play_from_file(m, query, @db_apm, true)
+      song = Dir.glob("#{@apm_folder}/*#{query}*", File::FNM_CASEFOLD).sample
+      if song
+        @vlc.clear_playlist
+        @vlc.stream=song
+        m.reply "Toma, chato!"
+      else
+        m.reply "No tengo #{query}"
+      end
     end
     
     def play_from_file(m, query, filename, force)
@@ -175,7 +188,10 @@ module Plugins
     end
 
     def list_apm(m)
-      list_file(m, @db_apm)
+      m.reply "Toma APM"
+      Dir["#{@apm_folder}/*"].each do |song|
+        m.reply song.split('/').last
+      end
     end
 
     def list_file(m, filename)

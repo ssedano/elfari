@@ -13,13 +13,14 @@
 
 :database: 'config/db/database'
 :apm: 'config/db/apm'
+:apm_folder: 'config/db/apm_songs'
 :melee:
   :channel: "#foobarslkj chan-key"
 
 :internet_song: 'config/tracks/internet_down.ogg'
 
 :vlc:
-  :bin: '/Applications/VLC.app/Contents/MacOS/VLC'
+  :bin: '/usr/bin/vlc'
   :host: '0.0.0.0'
   :port: 4000
   :args: '--ignore-config -I lua --lua-intf cli --no-video'

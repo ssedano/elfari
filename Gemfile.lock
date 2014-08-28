@@ -1,12 +1,12 @@
 GIT
-  remote: git://github.com/bnmrrs/ruby-youtube-dl.git
+  remote: https://github.com/bnmrrs/ruby-youtube-dl
   revision: 689cddae924827682c7ab16ada739d9d5e0960d6
   branch: master
   specs:
     ruby-youtube-dl (0.0.5)
 
 GIT
-  remote: git://github.com/ssedano/after_the_deadline.git
+  remote: https://github.com/ssedano/after_the_deadline
   revision: 221be3b21d0559693afb7e2cad714641fafeb437
   branch: master
   specs:
@@ -14,7 +14,7 @@ GIT
       crack
 
 GIT
-  remote: git://github.com/ssedano/mplayer-ruby.git
+  remote: https://github.com/ssedano/mplayer-ruby
   revision: 6f874ffc9ad1d3563e494a2d076a21701f301ade
   branch: master
   specs:
@@ -22,7 +22,7 @@ GIT
       open4 (>= 1.0.1)
 
 GIT
-  remote: git://github.com/ssedano/vlcrc.git
+  remote: https://github.com/ssedano/vlcrc
   revision: 8344c8ef06abaa09497eacea7e143bf5f24742b7
   branch: master
   specs:
@@ -83,7 +83,7 @@ GEM
     rest-client (1.6.7)
       mime-types (>= 1.16)
     ruby-mpd (0.2.1)
-    safe_yaml (1.0.2)
+    safe_yaml (1.0.3)
     simple_oauth (0.2.0)
     trollop (1.16.2)
     tweetstream (2.5.0)

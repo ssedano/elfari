@@ -153,7 +153,7 @@ module Plugins
       if song
         @vlc.clear_playlist
         @vlc.stream=song
-        m.reply "Toma, chato!"
+        m.reply "Toma, chato #{song.split('/').last}!"
       else
         m.reply "No tengo #{query}"
       end

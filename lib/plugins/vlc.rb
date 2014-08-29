@@ -118,8 +118,8 @@ module Plugins
 
     def add_song_apm(m, query)
       if query.match(/^http/)
-       `youtube-dl -o '#{@apm_folder}/%(title)s-%(format_id)s-%(id)s.%(ext)s' --no-progress   #{query}`.strip
-       m.reply "Ya es nuestro!"
+       `youtube-dl --verbose -o '#{@apm_folder}/%(title)s-%(id)s.%(ext)s' #{query}`.strip
+       m.reply "Ya es nuestro \"#{YoutubeDL::Downloader.video_title(query)}\"!"
       else
         m.reply "eso no es una uri"
       end
@@ -279,7 +279,12 @@ module Plugins
       m.reply "#{query.strip}"
       q = query.strip
       if q.match(/^http/)
-        @vlc.add_stream q
+        if @vlc.playing
+          @vlc.add_stream q
+        else
+          @vlc.clear_playlist
+          @vlc.stream=q
+        end
         @vlc.playing=true
         m.reply "Para ti #{q}"
       else

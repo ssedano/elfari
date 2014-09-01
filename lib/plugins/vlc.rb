@@ -23,6 +23,7 @@ module Plugins
     match /^list\s?apm/, method: :list_apm, :use_prefix => false
     match /ponme\s*er\s*(.*)/, method: :play_known, :use_prefix => false
     match /^apm\s*(.*)/, method: :play_apm, :use_prefix => false
+    match /^apm!\s*(.*)/, method: :force_play_apm, :use_prefix => false
     match /aluego(.*)/, method: :execute_aluego, :use_prefix => false
     match /trame\s*(.*)/, method: :trame, :use_prefix => false
     match /ponmelo.*/, method: :deprecated, :use_prefix => false
@@ -46,22 +47,26 @@ module Plugins
       @streaming = config[:streaming] || false
       config[:host] ||= 'localhost'
       config[:port] ||= 1234
-      config[:args] ||= '--no-video -I lua --lua-intf cli --ignore-config'
+      command = config[:args] || '--no-video -I lua --lua-intf cli --ignore-config'
+      command_aux = command
       config[:streaming_port] ||= 8888
       if @streaming
-        config[:args] << " --sout-keep --sout '#duplicate{dst=display,dst=standard{access=http,mux=asf,dst=#{config[:host]}:#{config[:streaming_port]}}}'"
+        command << " --sout-keep --sout '#duplicate{dst=display,dst=standard{access=http,mux=asf,dst=#{config[:host]}:#{config[:streaming_port]}}}'"
       end
       if config[:bin].nil?
-        @vlc = VLCRC::VLC.new config[:host], config[:port], config[:args]
+        @vlc = VLCRC::VLC.new config[:host], config[:port], command
+        @vlc_aux = VLCRC::VLC.new config[:host], (config[:port] + 1), command_aux
       else
-        @vlc = VLCRC::VLC.new config[:host], config[:port], config[:bin], config[:args]
+        @vlc = VLCRC::VLC.new config[:host], config[:port], config[:bin], command
+        @vlc_aux = VLCRC::VLC.new config[:host], config[:port] + 1, config[:bin], command_aux
       end
       @vlc.launch
-
+      @vlc_aux.launch
       # Connect to it (have to wait for it to launch though)
-      until @vlc.connected?
+      until @vlc.connected? and @vlc_aux.connected?
         sleep 0.1
         @vlc.connect
+        @vlc_aux.connect
       end
 
       @vlc.clear_playlist
@@ -99,7 +104,7 @@ module Plugins
         @vlc.volume=query.to_i
       end
     end
-    
+
     def increase_volume(m)
       vol = @vlc.volume
       if vol.nil? or vol == ""
@@ -108,7 +113,7 @@ module Plugins
       vol = vol.to_i + 10
       volume(m, vol)
     end
-    
+
     def decrease_volume(m)
       vol = @vlc.volume
       if vol.nil? or vol == ""
@@ -117,7 +122,7 @@ module Plugins
       vol = vol.to_i - 10
       @vlc.volume(m, vol)
     end
-    
+
     def next_song(m)
       @vlc.next
     end
@@ -161,6 +166,19 @@ module Plugins
     def play_apm(m, query)
       song = Dir.glob("#{@apm_folder}/*#{query}*", File::FNM_CASEFOLD).sample
       if song
+        @vlc_aux.clear_playlist
+        @vlc.pause
+        @vlc_aux.stream=song
+        @vlc.pause
+        m.reply "Toma, chato #{song.split('/').last}!"
+      else
+        m.reply "No tengo #{query}"
+      end
+    end
+
+    def force_play_apm(m, query)
+      song = Dir.glob("#{@apm_folder}/*#{query}*", File::FNM_CASEFOLD).sample
+      if song
         @vlc.clear_playlist
         @vlc.stream=song
         m.reply "Toma, chato #{song.split('/').last}!"
@@ -168,7 +186,8 @@ module Plugins
         m.reply "No tengo #{query}"
       end
     end
-    
+
+
     def play_from_file(m, query, filename, force)
       db = File.readlines(filename)
       found = false
@@ -300,6 +319,11 @@ module Plugins
       else
         m.reply "La uri debe empezar con http://. #{q}"
       end
+    end
+
+    def cleanup()
+      @vlc.exit
+      @vlc_aux.exit
     end
   end
 end

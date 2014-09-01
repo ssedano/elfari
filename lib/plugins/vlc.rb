@@ -43,9 +43,14 @@ module Plugins
       @db_apm = config[:apm]
       @apm_folder = config[:apm_folder]
 
+      @streaming = config[:streaming] || false
       config[:host] ||= 'localhost'
       config[:port] ||= 1234
       config[:args] ||= '--no-video -I lua --lua-intf cli --ignore-config'
+      config[:streaming_port] ||= 8888
+      if @streaming
+        config[:args] << " --sout-keep --sout '#duplicate{dst=display,dst=standard{access=http,mux=asf,dst=#{config[:host]}:#{config[:streaming_port]}}}'"
+      end
       if config[:bin].nil?
         @vlc = VLCRC::VLC.new config[:host], config[:port], config[:args]
       else
@@ -87,7 +92,12 @@ module Plugins
     end
 
     def volume(m, query)
-      @vlc.volume=query.to_i
+      if @streaming
+        n = ([query.to_i, 512].min / 512.0) * 100
+        `amixer -D pulse sset Master #{n}%`
+      else
+        @vlc.volume=query.to_i
+      end
     end
     
     def increase_volume(m)

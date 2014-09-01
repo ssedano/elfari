@@ -63,7 +63,9 @@ bot = Cinch::Bot.new do
                         :database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}",
                         :apm => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:apm]}",
                         :apm_folder => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:apm_folder]}",
-                        :internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}" },
+                        :internet_song => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:internet_song]}",
+                        :streaming_port => config[:vlc][:streaming_port],
+                        :streaming => config[:vlc][:streaming]},
 	#Plugins::Mpd => {:database => "#{File.expand_path(File.dirname(__FILE__))}/#{config[:database]}"},
          Plugins::Tuiter => {:lang => config[:twitter][:lang]}
     }
